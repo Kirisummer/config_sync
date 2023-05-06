@@ -1,0 +1,12 @@
+#!/bin/bash
+
+dirname="$(dirname "$(realpath "$0")")"
+package="$(basename "$0")"
+
+# "Pop" command from arguments
+cmd="$1"
+shift 1
+
+# Forward arguments to command in package
+echo "${dirname}/_${package}/${cmd}" "$@"
+

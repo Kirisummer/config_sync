@@ -1,0 +1,10 @@
+#!/bin/bash
+
+login="$1"
+
+source __validation
+validate_login "$login"
+check_not_admin "$login"
+
+ls --zero "$USER_DIR"/"$login"/_repos
+

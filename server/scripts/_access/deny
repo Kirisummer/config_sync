@@ -1,0 +1,13 @@
+#!/bin/bash
+
+login="$1"
+repo="$2"
+
+source __validation
+validate_login "$login"
+validate_repo_name "$repo"
+check_not_admin "$login"
+check_repo_allowed "$login" "$repo"
+
+rm "$USER_DIR"/"$login"/_repos/"$repo"
+

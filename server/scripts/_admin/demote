@@ -1,0 +1,13 @@
+#!/bin/bash
+
+login="$1"
+
+source __validation
+validate_login "$login"
+check_is_admin "$login"
+
+cd "$USER_DIR"/"$login"
+
+gpasswd -d "$login" "$ADMIN_GRP"
+rm repos
+ln --symbolic _repos repos

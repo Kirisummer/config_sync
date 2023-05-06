@@ -1,0 +1,22 @@
+# vim:ft=bash
+
+get_role() {
+    local login="$1"
+    local groups="$(groups "$login")"
+
+    if grep -qE "\<$OWNER_GRP\>" <<< "$groups"; then
+        echo owner
+    elif grep -qE "\<$ADMIN_GRP\>" <<< "$groups"; then
+        echo admin
+    else
+        echo user
+    fi
+}
+
+repo_exists() {
+    [ -d "$REPO_DIR"/"$1" ]
+}
+
+repo_allowed() {
+    [ -L "$USER_DIR"/"$1"/_repos/"$2" ]
+}

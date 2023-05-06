@@ -1,0 +1,9 @@
+#!/bin/bash
+
+name="$1"
+
+source __validation
+validate_repo_name "$name"
+
+mkdir "$REPO_DIR"/"$name" --mode 770
+

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+login="$1"
+repo="$2"
+
+source __validation
+validate_login "$login"
+validate_repo_name "$repo"
+check_not_admin "$login"
+check_repo_exists "$repo"
+check_repo_not_allowed "$login" "$repo"
+
+ln --symbolic "$REPO_DIR"/"$repo" "$USER_DIR"/"$login"/_repos/"$repo"
+

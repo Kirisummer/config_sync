@@ -1,0 +1,20 @@
+#!/bin/bash
+
+login="$1"
+password="$2"
+
+source __validation
+validate_login "$login"
+check_user_not_exists "$login"
+
+homedir="$USERS_DIR"/"$login"
+
+useradd \
+    --group "$USER_GRP" \
+    --base-dir "$USERS_DIR" \
+    --create-home \
+    "$login"
+chpasswd <<< "$login:$password"
+ln -s "$CMDS_DIR" "$homedir"/git-shell-commands
+mkdir "$homedir"/repos
+

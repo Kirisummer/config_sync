@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ls --zero "$HOME"/_repos

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source __lookup
+
+for user in "$USERS_DIR"/*; do
+    printf '%s %s\n' "$user" "$(get_role "$user")"
+done

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+name="$1"
+
+source __validation
+validate_repo_name "$name"
+
+rm --recurse --dir "$REPO_DIR"/"$name"
