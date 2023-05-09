@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash -e
 
-cd "$REPO_DIR"
+cd "$CMD_DIR"
 
 owner=$(grep -E "\<"$OWNER_GRP"\>" /etc/group | cut -d: -f4 | cut -d, -f1)
 
