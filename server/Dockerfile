@@ -21,7 +21,7 @@ WORKDIR ${ROOT_DIR}
 
 # install dependencies
 RUN apt update -y
-RUN DEBIAN_FRONTEND=noninteractive apt install openssh-server git python3 -y --no-install-recommends
+RUN DEBIAN_FRONTEND=noninteractive apt install openssh-server git -y --no-install-recommends
 RUN echo /usr/bin/git-shell >> /etc/shells
 
 # copy user scripts to image
