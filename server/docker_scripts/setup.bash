@@ -29,10 +29,9 @@ make_pkg() {
     # copy __package helper to package name
     cp __package "$pkg"
     # give permissions to main script and its subscripts
-    chmod 750 "$pkg"
-    chmod -R 750 _"$pkg"
+    chmod -R 750 "$pkg" "_${pkg}"
     # make Owner and supplied group own the package
-    chown "$OWNER_USER":"$group" "$pkg"
+    chown -R "$OWNER_USER":"$group" "$pkg" "_$pkg"
 }
 
 # Helpers

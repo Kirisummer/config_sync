@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-dirname="$(dirname "$0")"
+cd "$(dirname "$0")"
 package="$(basename "$0")"
 
 # "Pop" command from arguments
@@ -8,5 +8,5 @@ cmd="$1"
 shift 1
 
 # Forward arguments to command in package
-echo "${dirname}/_${package}/${cmd}" "$@"
+"_${package}/${cmd}" "$@"
 
