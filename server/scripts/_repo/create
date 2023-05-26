@@ -5,5 +5,7 @@ name="$1"
 source __validation
 validate_repo_name "$name"
 
-mkdir "$REPO_DIR"/"$name" --mode 770
+repo_dir="${ROOT_DIR}/repos/${name}"
 
+mkdir "$repo_dir" --mode 664
+chown "${OWNER_USER}:${ADMIN_GRP}" "$repo_dir"

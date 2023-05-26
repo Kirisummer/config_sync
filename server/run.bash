@@ -3,7 +3,6 @@
 cd "$(dirname "$0")"
 source env.bash
 
-ROOT_DIR=/config-server
 mkdir -p "$REPO_DIR" "$USER_DIR" "$PASSWD_DIR"
 sudo docker run -d --rm \
     -v "$(realpath $REPO_DIR)":"$ROOT_DIR"/repos \

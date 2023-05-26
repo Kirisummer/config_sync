@@ -10,5 +10,5 @@ check_not_admin "$login"
 check_repo_exists "$repo"
 check_repo_not_allowed "$login" "$repo"
 
-ln --symbolic "$REPO_DIR"/"$repo" "$USER_DIR"/"$login"/_repos/"$repo"
-
+ln --symbolic "${ROOT_DIR}/repos/${repo}" \
+              "${ROOT_DIR}/users/${login}/_repos/${repo}"

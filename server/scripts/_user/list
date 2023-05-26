@@ -2,7 +2,7 @@
 
 source __lookup
 
-for userdir in "$USERS_DIR"/*; do
-    user="$(basename "$userdir")"
-    printf '%s %s\n' "$user" "$(get_role "$user")"
+for userdir in "${ROOT_DIR}/users"/*; do
+    login="$(basename "$userdir")"
+    printf '%s %s\n' "$login" "$(get_role "$login")"
 done

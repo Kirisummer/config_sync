@@ -6,8 +6,8 @@ source __validation
 validate_login "$login"
 check_is_admin "$login"
 
-cd "$USER_DIR"/"$login"
+cd "${ROOT_DIR}/users/${login}"
 
-gpasswd -d "$login" "$ADMIN_GRP"
+gpasswd --delete "$login" "$ADMIN_GRP"
 rm repos
 ln --symbolic _repos repos

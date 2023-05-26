@@ -8,4 +8,3 @@ check_user_exists "$login"
 check_not_admin "$login"
 
 userdel --remove --force "$login"
-

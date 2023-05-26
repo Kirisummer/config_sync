@@ -6,5 +6,4 @@ source __validation
 validate_login "$login"
 check_not_admin "$login"
 
-ls --zero "$USER_DIR"/"$login"/_repos
-
+ls --zero "${ROOT_DIR}/users/$login/_repos"

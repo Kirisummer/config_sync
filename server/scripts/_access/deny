@@ -9,5 +9,4 @@ validate_repo_name "$repo"
 check_not_admin "$login"
 check_repo_allowed "$login" "$repo"
 
-rm "$USER_DIR"/"$login"/_repos/"$repo"
-
+rm "${ROOT_DIR}/users/${login}/_repos/${repo}"

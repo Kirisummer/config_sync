@@ -7,15 +7,13 @@ source __validation
 validate_login "$login"
 check_user_not_exists "$login"
 
-homedir="$USER_DIR"/"$login"
+homedir="${ROOT_DIR}/users/${login}"
 
 useradd \
-    --groups "$USER_GRP" \
-    --base-dir "$USER_DIR" \
     --create-home \
+    --base-dir "${ROOT_DIR}/users" \
+    --skel "${ROOT_DIR}/dir_skel" \
     --no-user-group \
+    --groups "$USER_GRP" \
     "$login"
 chpasswd <<< "$login:$password"
-ln -s "$CMD_DIR" "$homedir"/git-shell-commands
-mkdir "$homedir"/repos
-

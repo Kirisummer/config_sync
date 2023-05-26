@@ -1,5 +1,9 @@
 # vim:ft=bash
 
+user_exists() {
+    [ -d "${ROOT_DIR}/users/${1}" ]
+}
+
 get_role() {
     local login="$1"
     local groups="$(groups "$login")"
@@ -14,9 +18,10 @@ get_role() {
 }
 
 repo_exists() {
-    [ -d "$REPO_DIR"/"$1" ]
+    [ -d "${ROOT_DIR}/repos"/"$1" ]
 }
 
 repo_allowed() {
-    [ -L "$USER_DIR"/"$1"/_repos/"$2" ]
+    [ -L "${ROOT_DIR}/users"/"$1"/_repos/"$2" ]
 }
+
