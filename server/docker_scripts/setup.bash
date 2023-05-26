@@ -12,10 +12,9 @@ useradd \
     --create-home \
     --groups "$USER_GRP","$ADMIN_GRP","$OWNER_GRP" \
     --no-user-group \
+    --shell /usr/bin/git-shell \
     "$OWNER_USER"
 chpasswd <<< "$OWNER_USER:$OWNER_USER"
-ln -s "$CMD_DIR" "$USER_DIR"/"$OWNER_USER"/git-shell-commands
-ln -s "$REPO_DIR" "$USER_DIR"/repos
 
 # Make owner and their group own root directory
 chown "$OWNER_USER":"$OWNER_GRP" "$ROOT_DIR"

@@ -14,6 +14,17 @@ trap -p
 # Restore users and groups
 cp "$PASSWD_DIR"/* /etc || true
 
+# Create owner directory if it's missing
+# It cannot be created at startup because we cannot mount users on build
+# and overwrite users dir when it is mounted on run
+owner_dir="$USER_DIR"/"$OWNER_USER"
+if ! [ -d "$owner_dir" ]; then
+    mkdir "$USER_DIR"/"$OWNER_USER"
+    chown "$OWNER_USER":"$OWNER_GRP" "$USER_DIR"/"$OWNER_USER"
+    ln -s "$CMD_DIR" "$USER_DIR"/"$OWNER_USER"/git-shell-commands
+    ln -s "$REPO_DIR" "$USER_DIR"/"$OWNER_USER"/repos
+fi
+
 # Run ssh service
 service ssh start
 
