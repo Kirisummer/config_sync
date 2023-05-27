@@ -22,6 +22,6 @@ repo_exists() {
 }
 
 repo_allowed() {
-    [ -L "${ROOT_DIR}/users"/"$1"/_repos/"$2" ]
+    [ -L "${ROOT_DIR}/users"/"$1"/repos/"$2" ]
 }
 

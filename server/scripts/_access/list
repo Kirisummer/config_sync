@@ -6,4 +6,4 @@ source __validation
 validate_login "$login"
 check_not_admin "$login"
 
-ls --zero "${ROOT_DIR}/users/$login/_repos"
+find -L "${ROOT_DIR}/users/${login}/repos" -mindepth 1 -maxdepth 1 -printf '%f\n' | sort

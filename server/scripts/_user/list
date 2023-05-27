@@ -2,7 +2,8 @@
 
 source __lookup
 
-for userdir in "${ROOT_DIR}/users"/*; do
-    login="$(basename "$userdir")"
+users="$(find -L "${ROOT_DIR}/users" -mindepth 1 -maxdepth 1 -printf '%f\n' | sort)"
+
+for login in $users; do
     printf '%s %s\n' "$login" "$(get_role "$login")"
 done
