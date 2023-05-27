@@ -7,5 +7,6 @@ validate_repo_name "$name"
 
 repo_dir="${ROOT_DIR}/repos/${name}"
 
-mkdir "$repo_dir" --mode 664
+mkdir "$repo_dir" --mode 775
 chown "${OWNER_USER}:${ADMIN_GRP}" "$repo_dir"
+git -C "$repo_dir" init
