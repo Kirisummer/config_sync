@@ -9,11 +9,11 @@ check_user_not_exists "$login"
 
 homedir="${ROOT_DIR}/users/${login}"
 
-useradd \
+sudo useradd \
     --create-home \
     --base-dir "${ROOT_DIR}/users" \
     --skel "${ROOT_DIR}/dir_skel" \
     --no-user-group \
     --groups "$USER_GRP" \
     "$login"
-chpasswd <<< "$login:$password"
+sudo chpasswd <<< "$login:$password"

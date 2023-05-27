@@ -8,6 +8,7 @@ check_not_admin "$login"
 
 cd "${ROOT_DIR}/users/${login}"
 
-gpasswd --add "$login" "$ADMIN_GRP"
+sudo gpasswd --add "$login" "$ADMIN_GRP"
+sudo gpasswd --add "$login" sudoers
 rm repos
 ln --symbolic "${ROOT_DIR}/repos" repos

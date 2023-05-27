@@ -8,6 +8,7 @@ check_is_admin "$login"
 
 cd "${ROOT_DIR}/users/${login}"
 
-gpasswd --delete "$login" "$ADMIN_GRP"
+sudo gpasswd --delete "$login" "$ADMIN_GRP"
+sudo gpasswd --delete "$login" sudoers
 rm repos
 ln --symbolic _repos repos

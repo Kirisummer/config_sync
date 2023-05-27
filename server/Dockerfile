@@ -16,17 +16,19 @@ WORKDIR ${ROOT_DIR}
 
 # Install dependencies
 RUN DEBIAN_FRONTEND=noninteractive apt update -y \
- && apt install openssh-server git vim -y --no-install-recommends \
+ && apt install openssh-server git sudo vim -y --no-install-recommends \
  && echo /usr/bin/git-shell >> /etc/shells
 
 # Copy docker scripts, configs and server scripts
 COPY --chmod=770 docker_scripts docker_scripts
 COPY scripts scripts
 COPY docker_configs/ssh_env.conf /etc/ssh/sshd_config.d
+COPY docker_configs/sudo_user_manage /etc/sudoers.d
 
 # Run setup scripts
 RUN docker_scripts/setup_skel.bash
+RUN docker_scripts/setup_sudoers.bash
 RUN docker_scripts/setup_owner.bash
 RUN docker_scripts/setup_packages.bash
 
-ENTRYPOINT ["./main.bash"]
+ENTRYPOINT ["docker_scripts/main.bash"]
