@@ -20,15 +20,21 @@ RUN DEBIAN_FRONTEND=noninteractive apt update -y \
  && echo /usr/bin/git-shell >> /etc/shells
 
 # Copy docker scripts, configs and server scripts
-COPY --chmod=770 docker_scripts docker_scripts
-COPY scripts scripts
 COPY docker_configs/ssh_env.conf /etc/ssh/sshd_config.d
 COPY docker_configs/sudo_user_manage /etc/sudoers.d
 
 # Run setup scripts
-RUN docker_scripts/setup_skel.bash
+COPY --chmod=770 docker_scripts/setup_sudoers.bach
 RUN docker_scripts/setup_sudoers.bash
+
+COPY --chmod=770 docker_scripts/setup_skel.bach
+RUN docker_scripts/setup_skel.bash
+
+COPY --chmod=770 docker_scripts/setup_owner.bach
 RUN docker_scripts/setup_owner.bash
+
+COPY --chmod=770 docker_scripts/setup_packages.bach
+COPY scripts scripts
 RUN docker_scripts/setup_packages.bash
 
 ENTRYPOINT ["docker_scripts/main.bash"]
