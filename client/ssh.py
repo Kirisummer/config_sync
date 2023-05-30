@@ -12,9 +12,12 @@ class SSHCreds:
 @dataclass(frozen=True)
 class SSH:
     ssh_cmd: tuple[str]
-    input: bytes | None = None
+
     def run(self, *command):
-        return run((*self.ssh_cmd, *command), capture_output=True, input=self.input)
+        return run(
+                (*self.ssh_cmd, *command),
+                capture_output=True,
+        )
 
     @classmethod
     def get(cls, ssh_creds):
@@ -28,14 +31,11 @@ class SSH:
 
 class LinuxSSH(SSH):
     def __init__(self, ssh_creds):
-        super().__init__(
-                (
-                    'sshpass', *get_linux_ssh_cmd(),
-                    '-p', str(ssh_creds.port),
-                    f'{ssh_creds.login}@{ssh_creds.host}'
-                ),
-                input=ssh_creds.password.encode('utf-8')
-        )
+        super().__init__((
+                *get_linux_ssh_cmd(ssh_creds.password),
+                '-p', str(ssh_creds.port),
+                f'{ssh_creds.login}@{ssh_creds.host}'
+        ))
 
 class WinSSH(SSH):
     def __init__(self, ssh_creds):
@@ -45,9 +45,19 @@ class WinSSH(SSH):
                 f'{ssh_creds.login}@{ssh_creds.host}'
         ))
 
-def get_linux_ssh_cmd():
-    return 'ssh', '-q', '-o', 'StrictHostKeyChecking=no', \
+def get_linux_ssh_cmd(password):
+    return 'sshpass', '-p', password, \
+           'ssh', '-q', '-o', 'StrictHostKeyChecking=no', \
                         '-o', 'UserKnownHostsFile=/dev/null'
 
 def get_win_ssh_cmd(password):
     return 'plink', '-ssh', '-pw', password
+
+def get_ssh_cmd(password):
+    match system():
+        case 'Linux':
+            return get_linux_ssh_cmd(password)
+        case 'Windows':
+            return get_win_ssh_cmd(password)
+        case os_name:
+            raise NotImplementedError(f'OS not supported: {os_name}')
