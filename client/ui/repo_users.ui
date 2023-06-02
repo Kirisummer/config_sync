@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RepoConfigPage</class>
- <widget class="QWidget" name="RepoConfigPage">
+ <class>RepoUsers</class>
+ <widget class="QWidget" name="RepoUsers">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>578</height>
+    <width>570</width>
+    <height>400</height>
    </rect>
   </property>
-  <property name="acceptDrops">
-   <bool>false</bool>
+  <property name="minimumSize">
+   <size>
+    <width>570</width>
+    <height>400</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>570</width>
+    <height>400</height>
+   </size>
   </property>
   <property name="windowTitle">
-   <string>Repository Configuration</string>
+   <string>Repository Users</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
@@ -24,78 +33,45 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>40</width>
+       <width>1</width>
        <height>20</height>
       </size>
      </property>
     </spacer>
    </item>
    <item>
-    <layout class="QGridLayout" name="local_layout">
-     <item row="2" column="0" colspan="2">
-      <widget class="QListWidget" name="local_list">
-       <property name="dragEnabled">
-        <bool>true</bool>
-       </property>
-       <property name="dragDropMode">
-        <enum>QAbstractItemView::DragDrop</enum>
-       </property>
-       <property name="defaultDropAction">
-        <enum>Qt::MoveAction</enum>
-       </property>
-       <property name="sortingEnabled">
-        <bool>true</bool>
-       </property>
-       <item>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>3</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>4</string>
-        </property>
-       </item>
-      </widget>
+    <layout class="QGridLayout" name="allowed_layout">
+     <item row="1" column="0">
+      <widget class="QLineEdit" name="allowed_search_box"/>
      </item>
      <item row="1" column="1">
-      <widget class="QToolButton" name="local_search_button">
+      <widget class="QToolButton" name="allowed_search_button">
        <property name="text">
         <string>...</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QLineEdit" name="local_search_box"/>
+     <item row="2" column="0" colspan="2">
+      <widget class="QListWidget" name="allowed_list"/>
      </item>
      <item row="0" column="0" colspan="2">
-      <widget class="QLabel" name="local_label">
+      <widget class="QLabel" name="allowed_label">
        <property name="font">
         <font>
          <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>Local repos</string>
+        <string>Allowed</string>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="middle_layout">
+    <layout class="QVBoxLayout" name="center_layout">
      <item>
-      <spacer name="middle_spacer1">
+      <spacer name="center_spacer1">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -122,14 +98,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="new_repo_button">
-       <property name="text">
-        <string>New</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QDialogButtonBox" name="control_buttons">
+      <widget class="QDialogButtonBox" name="button_box">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -145,7 +114,7 @@
       </widget>
      </item>
      <item>
-      <spacer name="middle_spacer2">
+      <spacer name="center_spacer2">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -160,44 +129,31 @@
     </layout>
    </item>
    <item>
-    <layout class="QGridLayout" name="remote_layout">
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="remote_search_box"/>
-     </item>
-     <item row="1" column="2">
-      <widget class="QToolButton" name="remote_search_button">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1" colspan="2">
-      <widget class="QListWidget" name="remote_list">
-       <property name="dragEnabled">
-        <bool>true</bool>
-       </property>
-       <property name="dragDropMode">
-        <enum>QAbstractItemView::DragDrop</enum>
-       </property>
-       <property name="defaultDropAction">
-        <enum>Qt::MoveAction</enum>
-       </property>
-       <property name="sortingEnabled">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1" colspan="2">
-      <widget class="QLabel" name="remote_label">
+    <layout class="QGridLayout" name="denied_layout">
+     <item row="1" column="0" colspan="2">
+      <widget class="QLabel" name="denied_label">
        <property name="font">
         <font>
          <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
-        <string>Accessible remote repos</string>
+        <string>Denied</string>
        </property>
       </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLineEdit" name="denied_search_box"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QToolButton" name="denied_search_button">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <widget class="QListWidget" name="denied_list"/>
      </item>
     </layout>
    </item>
@@ -208,7 +164,7 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>40</width>
+       <width>1</width>
        <height>20</height>
       </size>
      </property>
