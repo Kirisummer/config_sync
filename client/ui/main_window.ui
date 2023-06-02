@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1096</width>
+    <height>823</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QTabWidget" name="tab_widget"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1096</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuAccount">
+    <property name="title">
+     <string>Account</string>
+    </property>
+    <addaction name="self_passwd"/>
+    <addaction name="self_log_out"/>
+   </widget>
+   <widget class="QMenu" name="menuRepository">
+    <property name="title">
+     <string>Repository</string>
+    </property>
+    <addaction name="repo_fetch"/>
+    <addaction name="repo_push"/>
+    <addaction name="repo_users"/>
+   </widget>
+   <widget class="QMenu" name="menuUsers">
+    <property name="title">
+     <string>Users</string>
+    </property>
+    <addaction name="users_manage"/>
+    <addaction name="users_admins"/>
+   </widget>
+   <addaction name="menuAccount"/>
+   <addaction name="menuRepository"/>
+   <addaction name="menuUsers"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="self_passwd">
+   <property name="text">
+    <string>Change Password...</string>
+   </property>
+  </action>
+  <action name="self_log_out">
+   <property name="text">
+    <string>Log Out</string>
+   </property>
+  </action>
+  <action name="repo_fetch">
+   <property name="text">
+    <string>Fetch</string>
+   </property>
+  </action>
+  <action name="repo_push">
+   <property name="text">
+    <string>Push</string>
+   </property>
+  </action>
+  <action name="repo_users">
+   <property name="text">
+    <string>Users...</string>
+   </property>
+  </action>
+  <action name="users_manage">
+   <property name="text">
+    <string>Manage...</string>
+   </property>
+  </action>
+  <action name="users_admins">
+   <property name="text">
+    <string>Admin Rights...</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
