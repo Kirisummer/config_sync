@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+source __lookup
+
+get_role "$(whoami)"

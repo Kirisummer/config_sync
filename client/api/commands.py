@@ -58,6 +58,10 @@ class SelfPackage(Package):
     def repos(self):
         return self._ssh('repos')
 
+    @value_request
+    def role(self):
+        return self._ssh('role')
+
 class UserPackage(Package):
     def __init__(self, ssh: 'SSH'):
         super().__init__(ssh, 'user')
