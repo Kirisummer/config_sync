@@ -172,6 +172,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>allowed_search_box</tabstop>
+  <tabstop>allowed_search_button</tabstop>
+  <tabstop>allowed_list</tabstop>
+  <tabstop>move_right_button</tabstop>
+  <tabstop>move_left_button</tabstop>
+  <tabstop>denied_search_box</tabstop>
+  <tabstop>denied_search_button</tabstop>
+  <tabstop>denied_list</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

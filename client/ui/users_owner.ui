@@ -182,6 +182,19 @@ password</string>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>users_search_box</tabstop>
+  <tabstop>users_search_button</tabstop>
+  <tabstop>users_list</tabstop>
+  <tabstop>create_button</tabstop>
+  <tabstop>delete_button</tabstop>
+  <tabstop>passwd_button</tabstop>
+  <tabstop>move_right_button</tabstop>
+  <tabstop>move_left_button</tabstop>
+  <tabstop>admins_search_box</tabstop>
+  <tabstop>admins_search_button</tabstop>
+  <tabstop>admins_list</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

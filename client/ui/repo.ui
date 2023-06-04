@@ -328,6 +328,15 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>branch_select</tabstop>
+  <tabstop>changes_search_box</tabstop>
+  <tabstop>changes_search_btn</tabstop>
+  <tabstop>changes</tabstop>
+  <tabstop>commit_msg</tabstop>
+  <tabstop>diff</tabstop>
+  <tabstop>files</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

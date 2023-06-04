@@ -125,6 +125,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>host</tabstop>
+  <tabstop>port</tabstop>
+  <tabstop>login</tabstop>
+  <tabstop>password</tabstop>
+  <tabstop>login_button</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

@@ -94,6 +94,14 @@ password</string>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>search_box</tabstop>
+  <tabstop>search_button</tabstop>
+  <tabstop>user_list</tabstop>
+  <tabstop>create_button</tabstop>
+  <tabstop>delete_button</tabstop>
+  <tabstop>passwd_button</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
