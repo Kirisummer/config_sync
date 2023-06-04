@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import ClassVar
 
-from PySide6.QtCore import QObject, Signal, Slot, Qt, QPoint
+from PySide6.QtCore import QObject, Qt, QPoint, Signal, Slot
 from PySide6.QtWidgets import QMenu, QMessageBox, QTableWidgetItem
 
 
@@ -10,17 +10,23 @@ class ChangeController:
         checked_out = Signal(str)
         change_switched = Signal(str)
 
-    def __init__(self, changes: 'QTableWidget', git: 'api.git.GitRepo'):
+    def __init__(self,
+                 changes: 'QTableWidget',
+                 heads: 'QComboBox',
+                 git: 'api.git.GitRepo'):
         self.changes = changes
+        self.heads = heads
         self.git = git
-        self.populate(self.git.head())
-        self.changes.itemSelectionChanged.connect(lambda: self.handle_select_change())
+        self.populate_heads()
+        self.heads.currentTextChanged.connect(lambda head: self.populate_commits(head))
+        self.changes.itemSelectionChanged.connect(lambda: self.handle_commit_change())
+        self.populate_commits(self.heads.currentText()) # populate with HEAD
         self.signals = self.Signals()
 
     def set_git(self, git: 'api.git.GitRepo'):
         self.git = git
 
-    def handle_select_change(self):
+    def handle_commit_change(self):
         indexes = self.changes.selectedIndexes()
         if indexes:
             row_idx = indexes[0].row()
@@ -30,8 +36,13 @@ class ChangeController:
     def get_selected_revision(self):
         return self.changes.verticalHeaderItem(self.changes.currentRow()).text()
 
-    def populate(self, revision):
-        self.changes.clear()
+    def populate_heads(self):
+        self.heads.clear()
+        self.heads.addItem('HEAD')
+        self.heads.addItems(self.git.branches())
+
+    def populate_commits(self, revision):
+        self.changes.setRowCount(0)
         for commit_hash, summary in self.git.revision_log(revision):
             row_idx = self.changes.rowCount()
             self.changes.insertRow(row_idx)

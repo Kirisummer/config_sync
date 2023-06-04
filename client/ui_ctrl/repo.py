@@ -32,7 +32,8 @@ class RepoPageController:
                 search_box=self.ui.changes_search_box,
                 search_btn=self.ui.changes_search_btn
         )
-        self.change_controller = ChangeController(self.ui.changes, self.git)
+        self.change_controller = ChangeController(
+                self.ui.changes, self.ui.head_select, self.git)
         self.ui.commit_msg_widget.hide()
         self.ui.diff_widget.hide()
 
@@ -65,6 +66,8 @@ class RepoPageController:
         self.ui.commit_msg_widget.show()
 
     def file_switched(self, new_item):
+        if new_item is None:
+            return
         revision = self.change_controller.get_selected_revision()
         diff = self.git.diff(revision, new_item.data(*self.PATH_DATA))
         self.ui.diff.setPlainText(diff)

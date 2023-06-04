@@ -42,3 +42,6 @@ class GitRepo:
         ).split('\n', 5)
         return diff_lines[-1]
 
+    def branches(self):
+        return list(branch.name for branch in self.git.branches)
+
