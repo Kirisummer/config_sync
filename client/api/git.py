@@ -22,6 +22,10 @@ class GitRepo:
     def local_changes(self):
         return map(lambda diff: diff.a_path, self.git.index.diff(None))
 
+    def commit_stat(self, revision):
+        commit = self.git.rev_parse(revision)
+        return list(commit.stats.files), commit.message
+
     def discard_local(self, revision):
         self.git.git.restore('--staged', '.')
         self.git.git.checkout('--', '.')
@@ -29,4 +33,12 @@ class GitRepo:
     def checkout(self, revision):
         self.discard_local()
         self.git.git.checkout(revision)
+
+    def diff(self, revision, file_path):
+        # cut first three lines (diff command, index hashes, blob filenames)
+        diff_lines = self.git.git.show(
+                '--color=never', '--pretty=tformat:',
+                revision, file_path
+        ).split('\n', 5)
+        return diff_lines[-1]
 

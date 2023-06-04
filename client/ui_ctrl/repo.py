@@ -1,16 +1,19 @@
 from .search import TableSearchController
 from .changes import ChangeController
 
+from bigtree import list_to_tree, preorder_iter
+from PySide6.QtCore import QObject, Qt
+from PySide6.QtWidgets import QWidget, QHeaderView, QTreeWidgetItem
+
+from api.git import GitRepo
 from config import Repo
 from ui.repo import Ui_RepoPage
 
-from PySide6.QtCore import QObject
-from PySide6.QtWidgets import QWidget
 
-from api.git import GitRepo
-from bigtree import list_to_tree
+class RepoPageController:
+    
+    PATH_DATA = (0, Qt.UserRole)
 
-class RepoPageController(QObject):
     def __init__(self, repo: Repo, ssh: 'api.ssh.SSH'):
         super().__init__()
 
@@ -36,11 +39,15 @@ class RepoPageController(QObject):
         # vertical header size
         header = self.ui.changes.verticalHeader()
         header.setFixedWidth(70)
-        header.setFixedHeight(header.sizeHint().height())
+        header.setSectionResizeMode(QHeaderView.Fixed)
 
         # actions
-        self.change_controller.change_switched.connect(self.change_switched)
-        self.ui.files.currentItemChanged.connect(self.file_switched)
+        self.change_controller.signals.change_switched.connect(
+                lambda revision: self.change_switched(revision)
+        )
+        self.ui.files.currentItemChanged.connect(
+                lambda file_path, _: self.file_switched(file_path)
+        )
 
     def set_ssh(self, ssh: 'api.ssh.SSH'):
         self.ssh = ssh
@@ -48,32 +55,41 @@ class RepoPageController(QObject):
         self.change_controller.set_git(self.git)
 
     def change_switched(self, revision):
-        self.populate_files(revision)
-        self.ui.commit_msg.setText(self.git.commit_message(revision))
+        files, commit_msg = self.git.commit_stat(revision)
+        self.populate_files(files)
+        self.ui.commit_msg.setPlainText(commit_msg)
 
         self.ui.diff_widget.hide()
-        self.ui.no_diff.show()
+        self.ui.no_file.show()
         self.ui.no_commit.hide()
         self.ui.commit_msg_widget.show()
 
-    def file_switched(self, prev_item, new_item):
+    def file_switched(self, new_item):
         revision = self.change_controller.get_selected_revision()
-        self.git.diff(revision, new_item.data())
+        diff = self.git.diff(revision, new_item.data(*self.PATH_DATA))
+        self.ui.diff.setPlainText(diff)
         self.ui.diff_widget.show()
-        self.ui.no_diff.hide()
+        self.ui.no_file.hide()
 
-    def populate_files(self, revision):
-        files = self.git.commit_files(revision)
+    def populate_files(self, files):
+        self.ui.files.clear()
         root = list_to_tree(map(lambda file: f'{self.repo.name}/{file}', files))
-        root_item = QTreeWidgetItem()
-        root_item.setText(self.repo.name)
+        root_item = self.tree_item(self.repo.name)
         root.set_attrs({'item': root_item})
         for node in preorder_iter(root):
             if node == root:
                 continue
-            item = QTreeWidgetItem()
-            item.setText(node.name)
-            item.setData(node.path_name.lstrip(f'{self.repo.name}/'))
+            file_path = node.path_name.removeprefix(f'/{self.repo.name}/')
+            item = self.tree_item(node.name, file_path)
             node.set_attrs({'item': item})
             node.parent.get_attr('item').addChild(item)
         self.ui.files.addTopLevelItem(root_item)
+        self.ui.files.expandAll()
+
+    @classmethod
+    def tree_item(cls, name, path=None):
+        item = QTreeWidgetItem()
+        item.setText(0, name)
+        if path:
+            item.setData(*cls.PATH_DATA, path)
+        return item

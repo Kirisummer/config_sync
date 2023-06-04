@@ -1,25 +1,31 @@
 from dataclasses import dataclass, field
 from typing import ClassVar
 
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject, Signal, Slot, Qt, QPoint
 from PySide6.QtWidgets import QMenu, QMessageBox, QTableWidgetItem
 
-class ChangeController(QObject):
-    checked_out = Signal(str)
-    change_switched = Signal(str)
+
+class ChangeController:
+    class Signals(QObject):
+        checked_out = Signal(str)
+        change_switched = Signal(str)
 
     def __init__(self, changes: 'QTableWidget', git: 'api.git.GitRepo'):
-        super().__init__()
         self.changes = changes
         self.git = git
         self.populate(self.git.head())
-        self.changes.currentCellChanged.connect(self.handle_select_change)
+        self.changes.itemSelectionChanged.connect(lambda: self.handle_select_change())
+        self.signals = self.Signals()
 
     def set_git(self, git: 'api.git.GitRepo'):
         self.git = git
 
-    def handle_select_change(self, row, *_):
-        self.signals.change_switched.emit(self.verticalHeaderItem(row).text())
+    def handle_select_change(self):
+        indexes = self.changes.selectedIndexes()
+        if indexes:
+            row_idx = indexes[0].row()
+            revision = self.changes.verticalHeaderItem(row_idx).text()
+            self.signals.change_switched.emit(revision)
 
     def get_selected_revision(self):
         return self.changes.verticalHeaderItem(self.changes.currentRow()).text()
@@ -30,6 +36,7 @@ class ChangeController(QObject):
             row_idx = self.changes.rowCount()
             self.changes.insertRow(row_idx)
             self.changes.setVerticalHeaderItem(row_idx, QTableWidgetItem(commit_hash))
+            item = QTableWidgetItem(summary)
             self.changes.setItem(row_idx, 0, QTableWidgetItem(summary))
 
     def checkout(self, revision):
@@ -42,7 +49,7 @@ class ChangeController(QObject):
             self.git.checkout(revision)
             self.signals.checked_out.emit(revision)
 
-    def handle_context_menu(self, pos: 'QPoint'):
+    def handle_context_menu(self, pos: QPoint):
         item = self.changes.itemAt(pos)
         revision = self.changes.verticalHeaderItem(row).text()
         menu = QMenu(self.changes)

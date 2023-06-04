@@ -7,8 +7,9 @@ from ui import Ui_Login
 from PySide6.QtCore import Signal, QObject
 from PySide6.QtWidgets import QWidget
 
-class LoginController(QObject):
-    logged_in = Signal((str, SSH))
+class LoginController:
+    class Signals(QObject):
+        logged_in = Signal((str, SSH))
 
     def __init__(self, config: 'config.ConfigManager'):
         super().__init__()
@@ -16,6 +17,7 @@ class LoginController(QObject):
         self.config = config
         self.ui = Ui_Login()
         self.widget = QWidget()
+        self.signals = self.Signals()
 
         self.ui.setupUi(self.widget)
         last_creds = self.config.get_last_creds()
@@ -28,7 +30,7 @@ class LoginController(QObject):
         self_pkg = SelfPackage(ssh)
         role = self_pkg.role()
         self.config.save_creds(creds)
-        self.logged_in.emit(role, ssh)
+        self.signals.logged_in.emit(role, ssh)
 
     @staticmethod
     def set_ui_creds(ui: Ui_Login, creds: SSHCreds):
