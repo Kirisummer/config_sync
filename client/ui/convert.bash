@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+cd "$(dirname "$0")"
+
 rm *.py || true
 classes=( )
 for ui_file in *.ui; do
