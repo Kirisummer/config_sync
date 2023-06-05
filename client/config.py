@@ -1,3 +1,4 @@
+from logging import getLogger
 from copy import deepcopy
 from dataclasses import dataclass, field
 from functools import wraps
@@ -9,10 +10,11 @@ from api.ssh import SSHCreds
 import tomlkit
 from PySide6.QtCore import QReadWriteLock
 
-
 UserConfig = TypedDict('UserConfig', {'login': str, 'host': str, 'port': int})
 RepoConfig = dict[str, str]
 Config = TypedDict('Config', {'user': UserConfig, 'repos': RepoConfig})
+
+LOGGER = getLogger(__file__)
 
 @dataclass(frozen=True)
 class Repo:
@@ -53,13 +55,18 @@ class ConfigManager:
             with open(self.config_path) as file:
                 return tomlkit.load(file)
         except OSError:
+            LOGGER.warning('Failed to read config: %s', self.config_path)
             config = deepcopy(ConfigManager.DEFAULT_CONFIG)
             self._save(config)
             return config
 
     def _save(self, config: Config):
-        with open(self.config_path, 'w') as file:
-            return tomlkit.dump(config, file)
+        try:
+            with open(self.config_path, 'w') as file:
+                return tomlkit.dump(config, file)
+        except OSError:
+            LOGGER.warning('Failed to write to config: %s', self.config_path)
+
 
     @read_lock
     def get_last_creds(self) -> SSHCreds:
