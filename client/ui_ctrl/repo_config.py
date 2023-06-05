@@ -1,9 +1,11 @@
 from shutil import rmtree
+from platform import system
 
-from PySide6.QtCore import QObject
-from PySide6.QtWidgets import QWidget, QMessageBox, QInputDialog
+from PySide6.QtCore import QObject, QStandardPaths
+from PySide6.QtWidgets import QWidget, QMessageBox, QInputDialog, QDialogButtonBox
 
 from .list_move import ListMoveController
+from .clone import CloneDialogController
 from api.command_error import (
         RepoExists, InvalidRepoName, RepoNotFound, CommandError
 )
@@ -26,6 +28,10 @@ class RepoConfigController:
         self.self_cmds = self_cmds
         self.git_cloner = git_cloner
 
+        # used for cloning dialog
+        self.last_dir = self.get_default_dir()
+        self.list_move = None
+
         # setup UI
         self.ui = Ui_RepoConfigPage()
         self.widget = QWidget()
@@ -34,21 +40,17 @@ class RepoConfigController:
         self.populate_lists()
 
         # create list move controller
-        self.list_move = ListMoveController(
-                self.ui.local_list, self.ui.to_remotes,
-                self.ui.remote_list, self.ui.to_locals
-        )
-
         # remove new and delete buttons for non-admins
         if not is_admin:
-            self.ui.new_repo_button.hide()
-            self.ui.delete_repo_button.hide()
+            self.ui.new_.hide()
+            self.ui.delete_.hide()
 
         # signal connections
-        self.ui.new_repo_button.clicked.connect(lambda _: self.create_remote_dialog())
-        self.ui.delete_repo_button.clicked.connect(lambda _: self.delete_remote_dialog())
+        self.ui.new_.clicked.connect(lambda _: self.create_remote_dialog())
+        self.ui.delete_.clicked.connect(lambda _: self.delete_remote_dialog())
         self.ui.remote_list.itemSelectionChanged.connect(lambda: self.update_delete_button())
-        self.ui.control_buttons.clicked.connect(lambda _: self.apply())
+        self.ui.apply.clicked.connect(lambda _: self.apply())
+        self.ui.reset.clicked.connect(lambda _: self.populate_lists())
 
     def replace_ssh(self,
                     repo_cmds: 'api.commands.RepoPackage',
@@ -73,6 +75,13 @@ class RepoConfigController:
             remote_repos -= local_repos
             self.ui.remote_list.addItems(remote_repos)
 
+        if self.list_move:
+            self.list_move.disconnect()
+        self.list_move = ListMoveController(
+                self.ui.local_list, self.ui.to_remotes,
+                self.ui.remote_list, self.ui.to_locals
+        )
+
     def apply(self):
         local_delete = self.list_move.diff(ListMoveController.Direction.Right)
         if local_delete:
@@ -82,9 +91,13 @@ class RepoConfigController:
 
         remote_clone = self.list_move.diff(ListMoveController.Direction.Left)
         if remote_clone:
-            clone = CloneDialogController(self.widget)
+            clone = CloneDialogController(self.widget, self.last_dir, remote_clone)
             clone.signals.repo_paths_selected.connect(lambda repos: self.remote_clone(repos))
-            clone.open()
+            clone.signals.directory_chosen.connect(lambda path: self.update_last_dir(path))
+            clone.dialog.exec()
+
+    def update_last_dir(self, path):
+        self.last_dir = path
 
     def discard(self):
         self.list_move.reset_diff()
@@ -180,7 +193,7 @@ class RepoConfigController:
             if not_found:
                 msg.append(self.widget.tr('Following repositories were not found:'))
                 msg.append(self.bullet_list(not_found))
-            self.show_error(self.widget.tr('Deletion error'), '\n'.join(msg))
+            self.show_error((self.widget.tr('Deletion error'), '\n'.join(msg)))
         else:
             QMessageBox.information(
                     self.widget,
@@ -208,10 +221,11 @@ class RepoConfigController:
                     self.widget.tr('Success'),
                     self.widget.tr('Repositories were cloned successfully')
             )
+        self.populate_lists()
 
     def update_delete_button(self):
         remote_selection = self.ui.remote_list.selectedItems()
-        self.ui.delete_repo_button.setEnabled(bool(remote_selection))
+        self.ui.delete_.setEnabled(bool(remote_selection))
 
     @staticmethod
     def bullet_list(repos: set[str]):
@@ -229,3 +243,13 @@ class RepoConfigController:
             err[0],
             err[1]
         )
+
+    @staticmethod
+    def get_default_dir():
+        match system():
+            case 'Linux':
+                return QStandardPaths.standardLocations(QStandardPaths.HomeLocation)[0]
+            case 'Windows':
+                return QStandardPaths.standardLocations(QStandardPaths.DesktopLocation)[0]
+            case os_name:
+                raise NotImplementedError(f'Unsupported OS: {os_name}')

@@ -24,12 +24,26 @@ class ListMoveController:
         }
         left_move.setEnabled(False)
         right_move.setEnabled(False)
-        left_list.currentRowChanged.connect(
-                lambda row: self.handle_select_change(self.Direction.Left, row))
-        right_list.currentRowChanged.connect(
-                lambda row: self.handle_select_change(self.Direction.Right, row))
-        left_move.clicked.connect(lambda _: self.move(self.Direction.Left))
-        right_move.clicked.connect(lambda _: self.move(self.Direction.Right))
+        self.connections = (
+                (
+                    left_list.currentRowChanged,
+                    lambda row: self.handle_select_change(self.Direction.Left, row)
+                ),
+                (
+                    right_list.currentRowChanged,
+                    lambda row: self.handle_select_change(self.Direction.Right, row)
+                ),
+                (
+                    left_move.clicked,
+                    lambda _: self.move(self.Direction.Left)
+                ),
+                (
+                    right_move.clicked,
+                    lambda _: self.move(self.Direction.Right)
+                )
+        )
+        for signal, func in self.connections:
+            signal.connect(func)
 
     def handle_select_change(self, direction: Direction, row):
         self.items[direction].button.setEnabled(row != -1)
@@ -51,3 +65,7 @@ class ListMoveController:
     def reset_diff(self):
         for item in self.items.values():
             item.moved.clear()
+
+    def disconnect(self):
+        for signal, func in self.connections:
+            signal.disconnect(func)

@@ -61,7 +61,7 @@ class GitCloner:
     def __init__(self,
                  cmd_bits: SSHCmdBits,
                  creds: SSHCreds):
-        self.ssh_cmd = get_ssh_cmd(cmd_bits, creds)
+        self.ssh_cmd = ' '.join(get_ssh_cmd(cmd_bits, creds))
         self.creds = creds
 
     @classmethod
