@@ -1,47 +1,66 @@
-from dataclasses import dataclass, field
-
 from git import Repo
 
-@dataclass(frozen=True)
-class GitRepo:
-    repo: 'config.Repo'
-    ssh: 'api.ssh.SSH'
-    git: Repo = field(init=False)
+def get_repo_url(creds: 'SSHCreds', repo_name: str):
+    return f'ssh://{creds.login}@{creds.host}:{creds.port}' \
+           f'/~{creds.login}/repos/{repo_name}'
 
-    def __post_init__(self):
-        super().__setattr__('git', Repo(self.repo.path))
+def get_ssh_cmd(cmd_bits: 'SSHCmdBits', creds: 'SSHCreds'):
+    return (*cmd_bits.passwd_pipe, creds.password, *cmd_bits.ssh_opts)
+
+class GitRepo:
+    def __init__(self,
+                 repo: 'config.Repo',
+                 creds: SSHCreds,
+                 cmd_bits: SSHCmdBits):
+        self.repo = Repo(repo.path)
+        self.repo_url = get_repo_url(creds, repo.name)
+        self.ssh_cmd = get_ssh_cmd(cmd_bits, creds)
 
     def head(self):
-        return self.git.head.commit.hexsha
+        return self.repo.head.commit.hexsha
 
     def revision_log(self, revision):
-        commit = self.git.rev_parse(revision)
+        commit = self.repo.rev_parse(revision)
         log = [commit, *list(commit.iter_parents())]
         return map(lambda commit: (commit.hexsha, commit.summary), log)
 
     def local_changes(self):
-        return map(lambda diff: diff.a_path, self.git.index.diff(None))
+        return map(lambda diff: diff.a_path, self.repo.index.diff(None))
 
     def commit_stat(self, revision):
-        commit = self.git.rev_parse(revision)
+        commit = self.repo.rev_parse(revision)
         return list(commit.stats.files), commit.message
 
     def discard_local(self, revision):
-        self.git.git.restore('--staged', '.')
-        self.git.git.checkout('--', '.')
+        self.repo.git.restore('--staged', '.')
+        self.repo.git.checkout('--', '.')
 
     def checkout(self, revision):
         self.discard_local()
-        self.git.git.checkout(revision)
+        self.repo.git.checkout(revision)
 
     def diff(self, revision, file_path):
         # cut first three lines (diff command, index hashes, blob filenames)
-        diff_lines = self.git.git.show(
+        diff_lines = self.repo.git.show(
                 '--color=never', '--pretty=tformat:',
                 revision, file_path
         ).split('\n', 5)
         return diff_lines[-1]
 
     def branches(self):
-        return list(branch.name for branch in self.git.branches)
+        return list(branch.name for branch in self.repo.branches)
 
+class GitCloner:
+    def __init__(self
+                 creds: SSHCreds,
+                 cmd_bits: SSHCmdBits):
+        self.creds = creds
+        self.ssh_cmd = get_ssh_cmd(cmd_bits, creds)
+
+    def clone(self, repo: 'config.Repo'):
+        repo_url = get_repo_url(self.creds, repo.name)
+        Repo.clone_from(
+                repo_url
+                repo.path,
+                env=dict(GIT_SSH_COMMAND=self.ssh_cmd)
+        )

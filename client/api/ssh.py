@@ -10,54 +10,54 @@ class SSHCreds:
     port: int
 
 @dataclass(frozen=True)
-class SSH:
-    ssh_cmd: tuple[str]
+class SSHCmdBits:
+    passwd_pipe: tuple[str]
+    ssh_opts: tuple[str]
+    port_arg: str
 
-    def run(self, *command):
+    @classmethod
+    def get(cls):
+        match system():
+            case 'Linux':
+                return cls.get_linux_ssh_cmd()
+            case 'Windows':
+                return cls.get_win_ssh_cmd()
+            case os_name:
+                raise NotImplementedError(f'OS not supported: {os_name}')
+
+    @staticmethod
+    def get_linux_ssh_cmd():
+        return SSHCmdBits(
+                ('sshpass', '-p'),
+                ('ssh', '-q', '-o', 'StrictHostKeyChecking=no', \
+                              '-o', 'UserKnownHostsFile=/dev/null'),
+                '-p'
+        )
+
+    @staticmethod
+    def get_win_ssh_cmd():
+        return SSHCmdBits(
+                ('plink', '-pw'),
+                ('-ssh',),
+                '-p'
+        )
+
+@dataclass(frozen=True)
+class SSH:
+    cmd_bits: SSHCmdBits
+    creds: SSHCreds
+
+    def run(self, *command, input: bytes=None):
         return run(
-                (*self.ssh_cmd, *command),
-                capture_output=True,
+                (
+                    *self.cmd_bits.passwd_pipe, self.creds.password,
+                    *self.cmd_bits.ssh_opts,
+                    self.cmd_bits.port_arg, self.creds.port,
+                    f'{self.creds.login}@{self.creds.host}', *command
+                ),
+                capture_output=True, input=input
         )
 
     @classmethod
     def get(cls, ssh_creds):
-        match system():
-            case 'Linux':
-                return LinuxSSH(ssh_creds)
-            case 'Windows':
-                return WinSSH(ssh_creds)
-            case os_name:
-                raise NotImplementedError(f'OS not supported: {os_name}')
-
-class LinuxSSH(SSH):
-    def __init__(self, ssh_creds):
-        super().__init__((
-                *get_linux_ssh_cmd(ssh_creds.password),
-                '-p', str(ssh_creds.port),
-                f'{ssh_creds.login}@{ssh_creds.host}'
-        ))
-
-class WinSSH(SSH):
-    def __init__(self, ssh_creds):
-        super().__init__((
-                *get_win_ssh_cmd(ssh_creds.password),
-                '-P', str(ssh_creds.port),
-                f'{ssh_creds.login}@{ssh_creds.host}'
-        ))
-
-def get_linux_ssh_cmd(password):
-    return 'sshpass', '-p', password, \
-           'ssh', '-q', '-o', 'StrictHostKeyChecking=no', \
-                        '-o', 'UserKnownHostsFile=/dev/null'
-
-def get_win_ssh_cmd(password):
-    return 'plink', '-ssh', '-pw', password
-
-def get_ssh_cmd(password):
-    match system():
-        case 'Linux':
-            return get_linux_ssh_cmd(password)
-        case 'Windows':
-            return get_win_ssh_cmd(password)
-        case os_name:
-            raise NotImplementedError(f'OS not supported: {os_name}')
+        return SSH(SSHCmdBits.get(), ssh_creds)
