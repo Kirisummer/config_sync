@@ -83,4 +83,4 @@ SPECIFIC_MAP = {
         for ex in SPECIFIC
 }
 
-__all__ = [CommandError, *SPECIFIC, SPECIFIC_MAP]
+__all__ = ['CommandError', *map(lambda ex: ex.__name__, SPECIFIC), 'SPECIFIC_MAP']
