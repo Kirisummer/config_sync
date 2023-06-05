@@ -30,7 +30,7 @@ class LoginController:
         self_pkg = SelfPackage(ssh)
         role = self_pkg.role()
         self.config.save_creds(creds)
-        self.signals.logged_in.emit(role, ssh)
+        self.signals.logged_in.emit(role, creds)
 
     @staticmethod
     def set_ui_creds(ui: Ui_Login, creds: SSHCreds):

@@ -48,16 +48,14 @@ class SSH:
     creds: SSHCreds
 
     def run(self, *command, input: bytes=None):
-        return run(
-                (
-                    *self.cmd_bits.passwd_pipe, self.creds.password,
-                    *self.cmd_bits.ssh_opts,
-                    self.cmd_bits.port_arg, self.creds.port,
-                    f'{self.creds.login}@{self.creds.host}', *command
-                ),
-                capture_output=True, input=input
+        command = (
+                *self.cmd_bits.passwd_pipe, self.creds.password,
+                *self.cmd_bits.ssh_opts,
+                self.cmd_bits.port_arg, str(self.creds.port),
+                f'{self.creds.login}@{self.creds.host}', *command
         )
+        return run(command, capture_output=True, input=input)
 
     @classmethod
-    def get(cls, ssh_creds):
-        return SSH(SSHCmdBits.get(), ssh_creds)
+    def get(cls, creds: SSHCreds):
+        return cls(SSHCmdBits.get(), creds)

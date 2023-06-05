@@ -1,4 +1,7 @@
 from git import Repo
+from git.exc import GitCommandError
+
+from .ssh import SSHCmdBits, SSHCreds
 
 def get_repo_url(creds: 'SSHCreds', repo_name: str):
     return f'ssh://{creds.login}@{creds.host}:{creds.port}' \
@@ -15,6 +18,10 @@ class GitRepo:
         self.repo = Repo(repo.path)
         self.repo_url = get_repo_url(creds, repo.name)
         self.ssh_cmd = get_ssh_cmd(cmd_bits, creds)
+
+    @classmethod
+    def get(cls, repo: 'config.Repo', creds: SSHCreds):
+        return cls(repo, creds, SSHCmdBits.get())
 
     def head(self):
         return self.repo.head.commit.hexsha
@@ -51,16 +58,20 @@ class GitRepo:
         return list(branch.name for branch in self.repo.branches)
 
 class GitCloner:
-    def __init__(self
-                 creds: SSHCreds,
-                 cmd_bits: SSHCmdBits):
-        self.creds = creds
+    def __init__(self,
+                 cmd_bits: SSHCmdBits,
+                 creds: SSHCreds):
         self.ssh_cmd = get_ssh_cmd(cmd_bits, creds)
+        self.creds = creds
+
+    @classmethod
+    def get(cls, creds: SSHCreds):
+        return cls(SSHCmdBits.get(), creds)
 
     def clone(self, repo: 'config.Repo'):
         repo_url = get_repo_url(self.creds, repo.name)
         Repo.clone_from(
-                repo_url
+                repo_url,
                 repo.path,
                 env=dict(GIT_SSH_COMMAND=self.ssh_cmd)
         )

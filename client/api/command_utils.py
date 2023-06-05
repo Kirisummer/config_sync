@@ -8,6 +8,7 @@ from functools import wraps
 class Package:
     ''' Class that represents command package '''
     ssh: 'SSH'
+    pkg_name: str
 
     def _ssh(self, command: str, *args: tuple[str]):
         return self.ssh.run(self.pkg_name, command, *args)

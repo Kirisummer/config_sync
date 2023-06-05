@@ -34,38 +34,24 @@
     <layout class="QGridLayout" name="local_layout">
      <item row="2" column="0" colspan="2">
       <widget class="QListWidget" name="local_list">
+       <property name="showDropIndicator" stdset="0">
+        <bool>false</bool>
+       </property>
        <property name="dragEnabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="dragDropMode">
-        <enum>QAbstractItemView::DragDrop</enum>
+        <enum>QAbstractItemView::NoDragDrop</enum>
        </property>
        <property name="defaultDropAction">
-        <enum>Qt::MoveAction</enum>
+        <enum>Qt::IgnoreAction</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
        </property>
        <property name="sortingEnabled">
         <bool>true</bool>
        </property>
-       <item>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>3</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>4</string>
-        </property>
-       </item>
       </widget>
      </item>
      <item row="1" column="1">
@@ -108,14 +94,14 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="move_right_button">
+      <widget class="QPushButton" name="to_remotes">
        <property name="text">
         <string>&gt;&gt;&gt;</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="move_left_button">
+      <widget class="QPushButton" name="to_locals">
        <property name="text">
         <string>&lt;&lt;&lt;</string>
        </property>
@@ -125,6 +111,13 @@
       <widget class="QPushButton" name="new_repo_button">
        <property name="text">
         <string>New</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="delete_repo_button">
+       <property name="text">
+        <string>Delete</string>
        </property>
       </widget>
      </item>
@@ -173,14 +166,17 @@
      </item>
      <item row="2" column="1" colspan="2">
       <widget class="QListWidget" name="remote_list">
+       <property name="showDropIndicator" stdset="0">
+        <bool>false</bool>
+       </property>
        <property name="dragEnabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="dragDropMode">
-        <enum>QAbstractItemView::DragDrop</enum>
+        <enum>QAbstractItemView::NoDragDrop</enum>
        </property>
        <property name="defaultDropAction">
-        <enum>Qt::MoveAction</enum>
+        <enum>Qt::IgnoreAction</enum>
        </property>
        <property name="sortingEnabled">
         <bool>true</bool>
@@ -220,8 +216,8 @@
   <tabstop>local_search_box</tabstop>
   <tabstop>local_search_button</tabstop>
   <tabstop>local_list</tabstop>
-  <tabstop>move_right_button</tabstop>
-  <tabstop>move_left_button</tabstop>
+  <tabstop>to_remotes</tabstop>
+  <tabstop>to_locals</tabstop>
   <tabstop>new_repo_button</tabstop>
   <tabstop>remote_search_box</tabstop>
   <tabstop>remote_search_button</tabstop>

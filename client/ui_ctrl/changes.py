@@ -4,7 +4,6 @@ from typing import ClassVar
 from PySide6.QtCore import QObject, Qt, QPoint, Signal, Slot
 from PySide6.QtWidgets import QMenu, QMessageBox, QTableWidgetItem
 
-
 class ChangeController:
     class Signals(QObject):
         checked_out = Signal(str)
@@ -13,18 +12,19 @@ class ChangeController:
     def __init__(self,
                  changes: 'QTableWidget',
                  heads: 'QComboBox',
-                 git: 'api.git.GitRepo'):
+                 repo: 'api.git.Repo'):
         self.changes = changes
         self.heads = heads
-        self.git = git
+        self.repo = repo
+
         self.populate_heads()
         self.heads.currentTextChanged.connect(lambda head: self.populate_commits(head))
         self.changes.itemSelectionChanged.connect(lambda: self.handle_commit_change())
         self.populate_commits(self.heads.currentText()) # populate with HEAD
         self.signals = self.Signals()
 
-    def set_git(self, git: 'api.git.GitRepo'):
-        self.git = git
+    def set_repo(self, repo: 'api.git.Repo'):
+        self.repo = repo
 
     def handle_commit_change(self):
         indexes = self.changes.selectedIndexes()
@@ -39,11 +39,11 @@ class ChangeController:
     def populate_heads(self):
         self.heads.clear()
         self.heads.addItem('HEAD')
-        self.heads.addItems(self.git.branches())
+        self.heads.addItems(self.repo.branches())
 
     def populate_commits(self, revision):
         self.changes.setRowCount(0)
-        for commit_hash, summary in self.git.revision_log(revision):
+        for commit_hash, summary in self.repo.revision_log(revision):
             row_idx = self.changes.rowCount()
             self.changes.insertRow(row_idx)
             self.changes.setVerticalHeaderItem(row_idx, QTableWidgetItem(commit_hash))
@@ -57,7 +57,7 @@ class ChangeController:
                 text=self.changes.tr('Your changes will be discarded. Checkout ') + revision + '?'
         )
         if result == QMessageBox.StandardButton.Yes:
-            self.git.checkout(revision)
+            self.repo.checkout(revision)
             self.signals.checked_out.emit(revision)
 
     def handle_context_menu(self, pos: QPoint):

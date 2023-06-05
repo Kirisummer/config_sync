@@ -9,17 +9,15 @@ from api.git import GitRepo
 from config import Repo
 from ui.repo import Ui_RepoPage
 
-
 class RepoPageController:
     
     PATH_DATA = (0, Qt.UserRole)
 
-    def __init__(self, repo: Repo, ssh: 'api.ssh.SSH'):
+    def __init__(self, repo_name: Repo, repo: 'api.git.Repo'):
         super().__init__()
 
+        self.repo_name = repo_name
         self.repo = repo
-        self.ssh = ssh
-        self.git = GitRepo(repo, self.ssh)
 
         self.ui = Ui_RepoPage()
         self.widget = QWidget()
@@ -33,7 +31,7 @@ class RepoPageController:
                 search_btn=self.ui.changes_search_btn
         )
         self.change_controller = ChangeController(
-                self.ui.changes, self.ui.head_select, self.git)
+                self.ui.changes, self.ui.head_select, self.repo)
         self.ui.commit_msg_widget.hide()
         self.ui.diff_widget.hide()
 
@@ -50,13 +48,12 @@ class RepoPageController:
                 lambda file_path, _: self.file_switched(file_path)
         )
 
-    def set_ssh(self, ssh: 'api.ssh.SSH'):
-        self.ssh = ssh
-        self.git = GitRepo(repo.path, self.ssh)
-        self.change_controller.set_git(self.git)
+    def set_repo(self, repo: 'api.git.Repo'):
+        self.repo = repo
+        self.change_controller.set_repo(repo)
 
     def change_switched(self, revision):
-        files, commit_msg = self.git.commit_stat(revision)
+        files, commit_msg = self.repo.commit_stat(revision)
         self.populate_files(files)
         self.ui.commit_msg.setPlainText(commit_msg)
 
@@ -69,25 +66,26 @@ class RepoPageController:
         if new_item is None:
             return
         revision = self.change_controller.get_selected_revision()
-        diff = self.git.diff(revision, new_item.data(*self.PATH_DATA))
+        diff = self.repo.diff(revision, new_item.data(*self.PATH_DATA))
         self.ui.diff.setPlainText(diff)
         self.ui.diff_widget.show()
         self.ui.no_file.hide()
 
     def populate_files(self, files):
         self.ui.files.clear()
-        root = list_to_tree(map(lambda file: f'{self.repo.name}/{file}', files))
-        root_item = self.tree_item(self.repo.name)
-        root.set_attrs({'item': root_item})
-        for node in preorder_iter(root):
-            if node == root:
-                continue
-            file_path = node.path_name.removeprefix(f'/{self.repo.name}/')
-            item = self.tree_item(node.name, file_path)
-            node.set_attrs({'item': item})
-            node.parent.get_attr('item').addChild(item)
-        self.ui.files.addTopLevelItem(root_item)
-        self.ui.files.expandAll()
+        if files:
+            root = list_to_tree(map(lambda file: f'{self.repo_name}/{file}', files))
+            root_item = self.tree_item(self.repo_name)
+            root.set_attrs({'item': root_item})
+            for node in preorder_iter(root):
+                if node == root:
+                    continue
+                file_path = node.path_name.removeprefix(f'/{self.repo_name}/')
+                item = self.tree_item(node.name, file_path)
+                node.set_attrs({'item': item})
+                node.parent.get_attr('item').addChild(item)
+            self.ui.files.addTopLevelItem(root_item)
+            self.ui.files.expandAll()
 
     @classmethod
     def tree_item(cls, name, path=None):
