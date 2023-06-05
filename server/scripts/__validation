@@ -5,7 +5,7 @@ source __lookup
 validate_login() {
     local login="$1"
     if ! [[ $login =~ [A-Za-z0-9_.-]+ ]]; then
-        printf '%s: Invalid login: `%s`' "$0" "$login"
+        printf '%s: Invalid login: `login=%s`' "$0" "$login"
         false
     fi
 }
@@ -13,7 +13,7 @@ validate_login() {
 validate_repo_name() {
     local repo="$1"
     if ! ( grep -qE '^([[:alnum:]]|[ _.-])+$' <<< "$repo" ); then
-        printf '%s: Invalid repo name: `%s`' "$0" "$repo"
+        printf '%s: Invalid repo name: `repo=%s`' "$0" "$repo"
         false
     fi
 }
@@ -21,7 +21,7 @@ validate_repo_name() {
 check_user_exists() {
     local login="$1"
     if ! user_exists $login; then
-        printf '%s: User does not exist: `%s`' "$0" "$login"
+        printf '%s: User does not exist: `login=%s`' "$0" "$login"
         false
     fi
 }
@@ -29,7 +29,7 @@ check_user_exists() {
 check_user_not_exists() {
     local login="$1"
     if user_exists $login; then
-        printf '%s: User exists: `%s`' "$0" "$login"
+        printf '%s: User exists: `login=%s`' "$0" "$login"
         false
     fi
 }
@@ -39,7 +39,7 @@ check_is_admin() {
 
     local role=$(get_role $login)
     if [[ $role != admin ]]; then
-        printf '%s: Not an admin: `%s`' "$0" "$login"
+        printf '%s: Not an admin: `login=%s`' "$0" "$login"
         false
     fi
 }
@@ -49,7 +49,7 @@ check_not_admin() {
 
     local role=$(get_role $login)
     if [[ $role == admin ]]; then
-        printf '%s: Is admin: `%s`' "$0" "$login"
+        printf '%s: Is admin: `login=%s`' "$0" "$login"
         false
     fi
 }
@@ -59,7 +59,16 @@ check_repo_exists() {
 
     #if [ ! -d "$REPO_DIR"/"$repo" ]; then
     if ! repo_exists "$repo"; then
-        printf '%s: Repo does not exist: `%s`' "$0" "$repo"
+        printf '%s: Repo does not exist: `repo=%s`' "$0" "$repo"
+        false
+    fi
+}
+
+check_no_repo() {
+    local repo="$1"
+
+    if repo_exists "$repo"; then
+        printf '%s: Repo exists: `repo=%s`' "$0" "$repo"
         false
     fi
 }

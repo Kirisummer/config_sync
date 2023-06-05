@@ -4,6 +4,7 @@ name="$1"
 
 source __validation
 validate_repo_name "$name"
+check_no_repo "$name"
 
 repo_dir="${ROOT_DIR}/repos/${name}"
 
