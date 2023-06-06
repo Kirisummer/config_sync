@@ -1,7 +1,7 @@
 from shutil import rmtree
 from platform import system
 
-from PySide6.QtCore import QObject, QStandardPaths, Signal
+from PySide6.QtCore import QObject, QStandardPaths, Signal, Slot
 from PySide6.QtWidgets import QWidget, QMessageBox, QInputDialog, QDialogButtonBox
 
 from .list_move import ListMoveController
@@ -17,6 +17,38 @@ class RepoConfigController:
     class Signals(QObject):
         repos_updated = Signal()
 
+        def __init__(self, control):
+            super().__init__()
+            self.control = control
+
+        @Slot(bool)
+        def create_remote_dialog(self, clicked):
+            self.control.create_remote_dialog()
+
+        @Slot(bool)
+        def delete_remote_dialog(self, clicked):
+            self.control.delete_remote_dialog()
+
+        @Slot()
+        def update_delete_button(self):
+            self.control.update_delete_button()
+
+        @Slot(bool)
+        def apply(self, clicked):
+            self.control.apply()
+
+        @Slot(bool)
+        def discard(self, clicked):
+            self.control.discard()
+
+        @Slot(object) # list['common.Repo']
+        def remote_clone(self, repos):
+            self.control.remote_clone(repos)
+
+        @Slot(str)
+        def update_last_dir(self, path):
+            self.control.update_last_dir(path)
+
     def __init__(self,
                  config: 'config.ConfigManager',
                  repo_cmds: 'api.commands.RepoPackage',
@@ -28,7 +60,7 @@ class RepoConfigController:
         self.repo_cmds = repo_cmds
         self.self_cmds = self_cmds
         self.git_cloner = git_cloner
-        self.signals = self.Signals()
+        self.signals = self.Signals(self)
 
         # used for cloning dialog
         self.last_dir = self.get_default_dir()
@@ -48,11 +80,12 @@ class RepoConfigController:
             self.ui.delete_.hide()
 
         # signal connections
-        self.ui.new_.clicked.connect(lambda _: self.create_remote_dialog())
-        self.ui.delete_.clicked.connect(lambda _: self.delete_remote_dialog())
-        self.ui.remote_list.itemSelectionChanged.connect(lambda: self.update_delete_button())
-        self.ui.apply.clicked.connect(lambda _: self.apply())
-        self.ui.reset.clicked.connect(lambda _: self.discard())
+        self.ui.new_.clicked.connect(self.signals.create_remote_dialog)
+        self.ui.delete_.clicked.connect(self.signals.delete_remote_dialog)
+        self.ui.remote_list.itemSelectionChanged.connect(
+                self.signals.update_delete_button)
+        self.ui.apply.clicked.connect(self.signals.apply)
+        self.ui.reset.clicked.connect(self.signals.discard)
 
     def replace_ssh(self,
                     repo_cmds: 'api.commands.RepoPackage',
@@ -78,7 +111,7 @@ class RepoConfigController:
 
         if self.list_move:
             self.list_move.disconnect()
-        self.list_move = ListMoveController(
+        self.list_move = ListMoveController('config',
                 self.ui.local_list, self.ui.to_remotes,
                 self.ui.remote_list, self.ui.to_locals
         )
@@ -93,10 +126,8 @@ class RepoConfigController:
         remote_clone = self.list_move.diff(ListMoveController.Direction.Left)
         if remote_clone:
             clone = CloneDialogController(self.widget, self.last_dir, remote_clone)
-            clone.signals.repo_paths_selected.connect(
-                    lambda repos: self.remote_clone(repos))
-            clone.signals.directory_chosen.connect(
-                    lambda path: self.update_last_dir(path))
+            clone.signals.repo_paths_selected.connect(self.signals.remote_clone)
+            clone.signals.directory_chosen.connect(self.signals.update_last_dir)
             clone.dialog.exec()
 
     def update_last_dir(self, path):

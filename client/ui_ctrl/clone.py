@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtWidgets import QWidget, QDialog, QTableWidgetItem, QFileDialog, QMessageBox
 
 from config import Repo
@@ -12,24 +12,38 @@ class CloneDialogController:
     PATH_COL = 1
 
     class Signals(QObject):
-        repo_paths_selected = Signal(object) # list['common.Repo'])
-        directory_chosen = Signal(str)
+        repo_paths_selected = Signal((object,)) # list['common.Repo'])
+        directory_chosen = Signal((str,))
+
+        def __init__(self, control):
+            super().__init__()
+            self.control = control
+
+        @Slot(int, int)
+        def try_unlock_clone(self, row, col):
+            self.control.try_unlock_clone()
+
+        @Slot(int, int)
+        def handle_double_block(self, row, col):
+            self.control.handle_double_click(row, col)
+
+        @Slot(bool)
+        def accept_dialog(self, clicked):
+            self.control.accept_dialog()
 
     def __init__(self, parent: QWidget, last_dir: str, repos: set[str]):
         self.dialog = QDialog(parent)
         self.ui = Ui_CloneDialog()
         self.ui.setupUi(self.dialog)
-        self.signals = self.Signals()
+        self.signals = self.Signals(self)
 
         self.populate_table(repos)
         self.last_dir = last_dir
         self.ui.clone.setEnabled(False)
 
-        self.ui.repo_table.cellChanged.connect(
-                lambda row, col: self.try_unlock_clone())
-        self.ui.repo_table.cellDoubleClicked.connect(
-                lambda row, col: self.handle_double_click(row, col))
-        self.ui.clone.clicked.connect(lambda _: self.accept_dialog())
+        self.ui.repo_table.cellChanged.connect(self.signals.try_unlock_clone)
+        self.ui.repo_table.cellDoubleClicked.connect(self.signals.handle_double_click)
+        self.ui.clone.clicked.connect(self.signals.accept_dialog)
         self.ui.cancel.clicked.connect(self.dialog.reject)
 
     def accept_dialog(self):

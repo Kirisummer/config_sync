@@ -2,7 +2,7 @@ from .search import TableSearchController
 from .changes import ChangeController
 
 from bigtree import list_to_tree, preorder_iter
-from PySide6.QtCore import QObject, Qt
+from PySide6.QtCore import QObject, Qt, Slot
 from PySide6.QtWidgets import QWidget, QTreeWidgetItem
 
 from api.git import GitRepo
@@ -10,7 +10,19 @@ from config import Repo
 from ui.repo import Ui_RepoPage
 
 class RepoPageController:
-    
+    class Signals(QObject):
+        def __init__(self, control):
+            super().__init__()
+            self.control = control
+
+        @Slot(str)
+        def change_switched(self, revision):
+            self.control.change_switched(revision)
+
+        @Slot(QTreeWidgetItem, QTreeWidgetItem)
+        def file_switched(self, curr, prev):
+            self.control.file_switched(curr)
+
     PATH_DATA = (0, Qt.UserRole)
 
     def __init__(self, repo_name: Repo, repo: 'api.git.Repo'):
@@ -18,11 +30,11 @@ class RepoPageController:
 
         self.repo_name = repo_name
         self.repo = repo
-
-        self.ui = Ui_RepoPage()
-        self.widget = QWidget()
+        self.signals = self.Signals(self)
 
         # setup UI's default state
+        self.ui = Ui_RepoPage()
+        self.widget = QWidget()
         self.ui.setupUi(self.widget)
         self.commit_search = TableSearchController(
                 table_widget=self.ui.changes,
@@ -37,11 +49,9 @@ class RepoPageController:
 
         # actions
         self.change_controller.signals.change_switched.connect(
-                lambda revision: self.change_switched(revision)
-        )
+                self.signals.change_switched)
         self.ui.files.currentItemChanged.connect(
-                lambda file_path, _: self.file_switched(file_path)
-        )
+                self.signals.file_switched)
 
     def set_repo(self, repo: 'api.git.GitRepo'):
         self.repo = repo

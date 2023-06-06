@@ -1,7 +1,30 @@
-from dataclasses import dataclass, field
+from PySide6.QtCore import QObject, Slot
+
+from dataclasses import dataclass, field, astuple
 from enum import Enum, auto
 
 class ListMoveController:
+    class Signals(QObject):
+        def __init__(self, control):
+            super().__init__()
+            self.control = control
+
+        @Slot(int)
+        def handle_left_select_change(self, row):
+            self.control.handle_select_change(self.control.Direction.Left, row)
+
+        @Slot(int)
+        def handle_right_select_change(self, row):
+            self.control.handle_select_change(self.control.Direction.Right, row)
+
+        @Slot(bool)
+        def right_move(self, clicked):
+            self.control.move(self.control.Direction.Right)
+
+        @Slot(bool)
+        def left_move(self, cliecked):
+            self.control.move(self.control.Direction.Left)
+
     class Direction(Enum):
         Left = False
         Right = True
@@ -15,42 +38,29 @@ class ListMoveController:
         button: 'QPushButton'
         moved: set = field(default_factory=set, init=False)
 
-    def __init__(self,
+    def __init__(self, name,
                  left_list, left_move,
                  right_list, right_move):
+        self.name = name
         self.items = {
                 self.Direction.Left: self.Item(left_list, left_move),
                 self.Direction.Right: self.Item(right_list, right_move)
         }
         left_move.setEnabled(False)
         right_move.setEnabled(False)
-        self.connections = (
-                (
-                    left_list.currentRowChanged,
-                    lambda row: self.handle_select_change(self.Direction.Left, row)
-                ),
-                (
-                    right_list.currentRowChanged,
-                    lambda row: self.handle_select_change(self.Direction.Right, row)
-                ),
-                (
-                    left_move.clicked,
-                    lambda _: self.move(self.Direction.Left)
-                ),
-                (
-                    right_move.clicked,
-                    lambda _: self.move(self.Direction.Right)
-                )
-        )
-        for signal, func in self.connections:
-            signal.connect(func)
+
+        self.signals = self.Signals(self)
+        left_list.currentRowChanged.connect(self.signals.handle_left_select_change)
+        right_list.currentRowChanged.connect(self.signals.handle_right_select_change)
+        left_move.clicked.connect(self.signals.right_move)
+        right_move.clicked.connect(self.signals.left_move)
 
     def handle_select_change(self, direction: Direction, row):
         self.items[direction].button.setEnabled(row != -1)
 
     def move(self, direction: Direction):
-        from_ = self.items[direction]
-        to = self.items[direction.invert()]
+        from_ = self.items[direction.invert()]
+        to = self.items[direction]
 
         item = from_.list_.takeItem(from_.list_.currentRow())
         repo_name = item.text()
@@ -67,5 +77,12 @@ class ListMoveController:
             item.moved.clear()
 
     def disconnect(self):
-        for signal, func in self.connections:
-            signal.disconnect(func)
+        left_list = self.items[self.Direction.Left].list_
+        left_move = self.items[self.Direction.Left].button
+        right_list = self.items[self.Direction.Right].list_
+        right_move = self.items[self.Direction.Right].button
+
+        left_list.currentRowChanged.disconnect(self.signals.handle_left_select_change)
+        right_list.currentRowChanged.disconnect(self.signals.handle_right_select_change)
+        left_move.clicked.disconnect(self.signals.right_move)
+        right_move.clicked.disconnect(self.signals.left_move)

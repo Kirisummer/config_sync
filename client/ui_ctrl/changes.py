@@ -7,8 +7,24 @@ from PySide6.QtWidgets import QMenu, QMessageBox, QTableWidgetItem, QHeaderView
 
 class ChangeController:
     class Signals(QObject):
-        checked_out = Signal(str)
-        change_switched = Signal(str)
+        checked_out = Signal((str,))
+        change_switched = Signal((str,))
+
+        def __init__(self, control):
+            super().__init__()
+            self.control = control
+
+        @Slot(str)
+        def populate_commits(self, head):
+            self.control.populate_commits(head)
+
+        @Slot(str)
+        def handle_commit_change(self):
+            self.control.handle_commit_change()
+
+        @Slot(QPoint)
+        def handle_context_menu(self, pos):
+            self.control.handle_context_menu(pos)
 
     HEAD_MARKER = '*'
     HEAD_COL = 0
@@ -21,6 +37,7 @@ class ChangeController:
         self.changes = changes
         self.heads = heads
         self.repo = repo
+        self.signals = self.Signals(self)
 
         # vertical header sizes
         header = self.changes.verticalHeader()
@@ -29,12 +46,10 @@ class ChangeController:
         self.changes.setColumnWidth(self.HEAD_COL, 20)
 
         self.populate_heads()
-        self.heads.currentTextChanged.connect(lambda head: self.populate_commits(head))
-        self.changes.itemSelectionChanged.connect(lambda: self.handle_commit_change())
-        self.changes.customContextMenuRequested.connect(
-                lambda pos: self.handle_context_menu(pos))
+        self.heads.currentTextChanged.connect(self.signals.populate_commits)
+        self.changes.itemSelectionChanged.connect(self.signals.handle_commit_change)
+        self.changes.customContextMenuRequested.connect(self.signals.handle_context_menu)
         self.populate_commits(self.heads.currentText()) # populate with HEAD
-        self.signals = self.Signals()
 
     def set_repo(self, repo: 'api.git.Repo'):
         self.repo = repo

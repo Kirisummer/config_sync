@@ -1,4 +1,6 @@
-from api.command_errors import (
+from PySide6.QtWidgets import QMessageBox
+
+from api.command_error import (
     InvalidLoginError,
     UserNotFoundError,
     UserExistsError,
@@ -6,15 +8,18 @@ from api.command_errors import (
     UserIsAdminError,
     InvalidRepoNameError,
     RepoNotFoundError,
-    RepoExistsError
+    RepoExistsError,
+    RepoAllowedError,
+    RepoNotAllowedError,
+    CommandError
 )
 
 def show_error(widget: 'QWidget', ex: CommandError):
     title = widget.tr(ex.ERR_MSG)
     if type(ex) in ERROR_TABLE:
-        label = widget.tr(ERROR_TABLE[ex]).format(*args[1:])
+        label = widget.tr(ERROR_TABLE[type(ex)]).format(*ex.args[1:])
     else:
-        label = ex.message
+        label = ex.args[0]
     QMessageBox.critical(widget, title, label)
 
 ERROR_TABLE = {
@@ -23,7 +28,7 @@ ERROR_TABLE = {
         UserNotFoundError:    'User {} was not found on the server',
         UserExistsError:      'User {} already exists on the server',
         UserNotAdminError:    'User {} is not an admin',
-        UserIsAdminError:     'User {} is already an admin',
+        UserIsAdminError:     'User {} is an admin',
         InvalidRepoNameError: 'Repository name {} is not valid. ' \
                               'Repository name may consist of letters, ' \
                               'numbers, spaces and symbols "_.-"',

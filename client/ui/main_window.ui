@@ -58,7 +58,6 @@
      <string>Users</string>
     </property>
     <addaction name="users_manage"/>
-    <addaction name="users_admins"/>
    </widget>
    <addaction name="menuAccount"/>
    <addaction name="menuRepository"/>
