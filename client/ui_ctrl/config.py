@@ -6,8 +6,9 @@ from PySide6.QtWidgets import QWidget, QMessageBox, QInputDialog, QDialogButtonB
 
 from .list_move import ListMoveController
 from .clone import CloneDialogController
+from .errors import show_error
 from api.command_error import (
-        RepoExists, InvalidRepoName, RepoNotFound, CommandError
+        RepoExistsError, InvalidRepoNameError, RepoNotFoundError, CommandError
 )
 from api.git import GitCommandError
 from ui import Ui_RepoConfigPage
@@ -67,12 +68,11 @@ class RepoConfigController:
         self.ui.local_list.addItems(local_repos)
 
         self.ui.remote_list.clear()
-        remote_repos = None
         try:
             remote_repos = set(self.self_cmds.repos())
         except CommandError as ex:
-            self.show_error(self.unknown_error(ex))
-        if remote_repos:
+            show_error(self.widget, ex)
+        else:
             remote_repos -= local_repos
             self.ui.remote_list.addItems(remote_repos)
 
@@ -93,8 +93,10 @@ class RepoConfigController:
         remote_clone = self.list_move.diff(ListMoveController.Direction.Left)
         if remote_clone:
             clone = CloneDialogController(self.widget, self.last_dir, remote_clone)
-            clone.signals.repo_paths_selected.connect(lambda repos: self.remote_clone(repos))
-            clone.signals.directory_chosen.connect(lambda path: self.update_last_dir(path))
+            clone.signals.repo_paths_selected.connect(
+                    lambda repos: self.remote_clone(repos))
+            clone.signals.directory_chosen.connect(
+                    lambda path: self.update_last_dir(path))
             clone.dialog.exec()
 
     def update_last_dir(self, path):
@@ -105,65 +107,36 @@ class RepoConfigController:
         self.list_move.reset_diff()
 
     def create_remote_dialog(self):
-        while True:
-            remote_name, ok = QInputDialog.getText(
-                    self.widget,
-                    self.widget.tr('Create remote'),
-                    self.widget.tr('Name of new remote:')
-            )
-            
-            if ok:
-                err = None
-                if remote_name:
-                    try:
-                        self.repo_cmds.create(remote_name)
-                    except RepoExists:
-                        err = (
-                                self.widget.tr('Repository exists'),
-                                ' '.join((self.widget.tr('Repository with name'), remote_name, self.widget.tr('already exists')))
-                        )
-                    except InvalidRepoName:
-                        err = (
-                                self.widget.tr('Invalid repository name'),
-                                ' '.join((remote_name, self.widget.tr('is not a valid repository name')))
-                        )
-                    except CommandError as ex:
-                        err = self.unknown_error(ex)
-                else:
-                    err = (
-                            self.widget.tr('Empty repository name'),
-                            self.widget.tr('Repository name can not be empty')
-                    )
-
-                if err:
-                    self.show_error(err)
+        remote_name, ok = QInputDialog.getText(
+                self.widget,
+                self.widget.tr('Create remote'),
+                self.widget.tr('Name of new remote:')
+        )
+        
+        if ok:
+            if remote_name:
+                try:
+                    self.repo_cmds.create(remote_name)
+                except (InvalidRepoNameError, RepoExistsError, CommandError) as ex:
+                    show_error(self.widget, ex)
                 else:
                     self.ui.remote_list.addItem(QListWidgetItem(remote_name))
-                    break
             else:
-                # cancel
-                break
+                show_error(self.widget, InvalidRepoNameError(remote_name))
 
     def delete_remote_dialog(self):
         remote_name = self.ui.remote_list.selectedItems()[0].text()
         ok = QMessageBox.question(
                 self.widget,
                 self.widget.tr('Remote repository deletion'),
-                ' '.join((self.widget.tr('Remove remote repository'), remote_name))
+                self.widget.tr('Remove remote repository {}?').format(remote_name)
         )
         if ok == QMessageBox.StandardButton.Yes:
             err = None
             try:
                 self.repo_cmds.delete(remote_name)
-            except RepoNotFound:
-                err = (
-                        self.widget.tr('Repository was not found'),
-                        ' '.join((self.widget.tr('Repository'), remote_name, self.widget.tr('was not found on server')))
-                )
-            except CommandError:
-                err = self.unknown_error(ex)
-            if err:
-                self.show_error(err)
+            except (RepoNotFoundError, CommandError) as ex:
+                show_error(self.widget, ex)
 
     def local_delete_dialog(self, local_delete: set[str]):
         repo_text = self.bullet_list(local_delete)
@@ -195,7 +168,11 @@ class RepoConfigController:
             if not_found:
                 msg.append(self.widget.tr('Following repositories were not found:'))
                 msg.append(self.bullet_list(not_found))
-            self.show_error((self.widget.tr('Deletion error'), '\n'.join(msg)))
+            QMessageBox.critical(
+                    self.widget,
+                    self.widget.tr('Deletion error'),
+                    '\n'.join(msg)
+            )
         else:
             QMessageBox.information(
                     self.widget,
@@ -211,13 +188,18 @@ class RepoConfigController:
                 self.git_cloner.clone(repo)
                 self.config.add_repo(repo)
             except GitCommandError as ex:
-                self.show_error(ex)
+                QMessageBox.critical(
+                        self.widget,
+                        self.widget.tr('Git error'),
+                        ex.message
+                )
                 not_cloned.add(repo.name)
         if not_cloned:
-            self.show_error((
-                self.widget.tr('Cloning failed'),
-                self.widget.tr('Failed to clone repositories:') + self.bullet_list(not_cloned)
-            ))
+            QMessageBox.critical(
+                    self.widget,
+                    self.widget.tr('Cloning failed'),
+                    self.widget.tr('Failed to clone repositories:') + self.bullet_list(not_cloned)
+            )
         else:
             QMessageBox.information(
                     self.widget,
@@ -234,19 +216,6 @@ class RepoConfigController:
     @staticmethod
     def bullet_list(repos: set[str]):
         return ''.join((f'\n  - {repo}' for repo in repos))
-
-    def unknown_error(self, ex: CommandError):
-        return (
-                self.widget.tr('Unknown error'),
-                ex.message
-        )
-
-    def show_error(self, err):
-        QMessageBox.critical(
-            self.widget,
-            err[0],
-            err[1]
-        )
 
     @staticmethod
     def get_default_dir():

@@ -10,7 +10,7 @@ class CommandError(RuntimeError):
                 *map(self.pair_msg, kw.items())
             ))
         ))
-        super.__init__(msg)
+        super.__init__(msg, *kw.values())
 
     @staticmethod
     def pair_msg(pair):
@@ -83,4 +83,8 @@ SPECIFIC_MAP = {
         for ex in SPECIFIC
 }
 
-__all__ = ['CommandError', *map(lambda ex: ex.__name__, SPECIFIC), 'SPECIFIC_MAP']
+__all__ = [
+        'CommandError',
+        *map(lambda ex: ex.__name__, SPECIFIC),
+        'SPECIFIC_MAP'
+]
