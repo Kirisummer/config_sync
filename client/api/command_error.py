@@ -26,16 +26,16 @@ class LoginError(CommandError):
 class InvalidLoginError(LoginError):
     ERR_MSG = 'Invalid login'
 
-class UserNotFound(LoginError):
+class UserNotFoundError(LoginError):
     ERR_MSG = 'User does not exist'
 
-class UserExists(LoginError):
+class UserExistsError(LoginError):
     ERR_MSG = 'User exists'
 
-class UserNotAdmin(LoginError):
+class UserNotAdminError(LoginError):
     ERR_MSG = 'Not an admin'
 
-class UserIsAdmin(LoginError):
+class UserIsAdminError(LoginError):
     ERR_MSG = 'Is admin'
 
 # Repo errors
@@ -45,13 +45,13 @@ class RepoError(CommandError):
         super.__init__(repo=repo)
         self.repo = repo
 
-class InvalidRepoName(RepoError):
+class InvalidRepoNameError(RepoError):
     ERR_MSG = 'Invalid repo name'
 
-class RepoNotFound(RepoError):
+class RepoNotFoundError(RepoError):
     ERR_MSG = 'Repo does not exits'
 
-class RepoExists(RepoError):
+class RepoExistsError(RepoError):
     ERR_MSG = 'Repo exists'
 
 # Access errors
@@ -62,21 +62,21 @@ class AccessError(CommandError):
         self.login = login
         self.repo = repo
 
-class RepoAllowed(CommandError):
+class RepoAllowedError(CommandError):
     ERR_MSG = 'Repo is allowed'
 
-class RepoNotAllowed(CommandError):
+class RepoNotAllowedError(CommandError):
     ESS_MSG = 'Repo is not allowed'
 
 SPECIFIC = [
     InvalidLoginError,
-    UserNotFound,
-    UserExists,
-    UserNotAdmin,
-    UserIsAdmin,
-    InvalidRepoName,
-    RepoNotFound,
-    RepoExists
+    UserNotFoundError,
+    UserExistsError,
+    UserNotAdminError,
+    UserIsAdminError,
+    InvalidRepoNameError,
+    RepoNotFoundError,
+    RepoExistsError
 ]
 SPECIFIC_MAP = {
         ex.ERR_MSG: ex
