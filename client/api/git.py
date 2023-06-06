@@ -1,5 +1,5 @@
 from git import Repo
-from git.exc import GitCommandError
+from git.exc import GitCommandError, BadName
 
 from .ssh import SSHCmdBits, SSHCreds
 
@@ -24,10 +24,16 @@ class GitRepo:
         return cls(repo, creds, SSHCmdBits.get())
 
     def head(self):
-        return self.repo.head.commit.hexsha
+        if self.repo.head.is_valid():
+            return self.repo.head.commit.hexsha
+        else:
+            return None
 
     def revision_log(self, revision):
-        commit = self.repo.rev_parse(revision)
+        try:
+            commit = self.repo.rev_parse(revision)
+        except BadName:
+            return []
         log = [commit, *list(commit.iter_parents())]
         return map(lambda commit: (commit.hexsha, commit.summary), log)
 

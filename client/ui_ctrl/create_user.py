@@ -24,5 +24,5 @@ class CreateUserController:
         self.ui.setupUi(self.dialog)
         self.signals = self.Signals(self)
 
-        self.ui.create.clicked.connect(self.emit_creds)
+        self.ui.create.clicked.connect(self.signals.emit_creds)
         self.ui.create.clicked.connect(self.dialog.accept)

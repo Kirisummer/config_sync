@@ -24,7 +24,7 @@ class CloneDialogController:
             self.control.try_unlock_clone()
 
         @Slot(int, int)
-        def handle_double_block(self, row, col):
+        def handle_double_click(self, row, col):
             self.control.handle_double_click(row, col)
 
         @Slot(bool)

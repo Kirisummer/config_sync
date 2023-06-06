@@ -2,11 +2,14 @@ from shutil import rmtree
 from platform import system
 
 from PySide6.QtCore import QObject, QStandardPaths, Signal, Slot
-from PySide6.QtWidgets import QWidget, QMessageBox, QInputDialog, QDialogButtonBox
+from PySide6.QtWidgets import (
+        QWidget, QMessageBox, QInputDialog, QDialogButtonBox, QListWidgetItem
+)
 
 from .list_move import ListMoveController
 from .clone import CloneDialogController
 from .errors import show_error
+from .search import ListSearchController
 from api.command_error import (
         RepoExistsError, InvalidRepoNameError, RepoNotFoundError, CommandError
 )
@@ -70,6 +73,17 @@ class RepoConfigController:
         self.ui = Ui_RepoConfigPage()
         self.widget = QWidget()
         self.ui.setupUi(self.widget)
+
+        self.local_search = ListSearchController(
+                self.ui.local_search_box,
+                self.ui.local_search_button,
+                self.ui.local_list
+        )
+        self.remote_search = ListSearchController(
+                self.ui.remote_search_box,
+                self.ui.remote_search_button,
+                self.ui.remote_list
+        )
 
         self.populate_lists()
 

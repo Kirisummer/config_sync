@@ -24,6 +24,7 @@ class RepoPageController:
             self.control.file_switched(curr)
 
     PATH_DATA = (0, Qt.UserRole)
+    COMMIT_SUMMARY_COL = 1
 
     def __init__(self, repo_name: Repo, repo: 'api.git.Repo'):
         super().__init__()
@@ -38,7 +39,7 @@ class RepoPageController:
         self.ui.setupUi(self.widget)
         self.commit_search = TableSearchController(
                 table_widget=self.ui.changes,
-                search_col=0,
+                search_col=self.COMMIT_SUMMARY_COL,
                 search_box=self.ui.changes_search_box,
                 search_btn=self.ui.changes_search_btn
         )
