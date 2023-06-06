@@ -12,7 +12,7 @@ class CloneDialogController:
     PATH_COL = 1
 
     class Signals(QObject):
-        repo_paths_selected = Signal(object) # list['config.Repo']
+        repo_paths_selected = Signal(object) # list['common.Repo'])
         directory_chosen = Signal(str)
 
     def __init__(self, parent: QWidget, last_dir: str, repos: set[str]):
@@ -33,7 +33,6 @@ class CloneDialogController:
         self.ui.cancel.clicked.connect(self.dialog.reject)
 
     def accept_dialog(self):
-        print('accept')
         repos = []
         for row in range(self.ui.repo_table.rowCount()):
             repo = Repo(

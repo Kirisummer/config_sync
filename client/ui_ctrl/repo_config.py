@@ -1,7 +1,7 @@
 from shutil import rmtree
 from platform import system
 
-from PySide6.QtCore import QObject, QStandardPaths
+from PySide6.QtCore import QObject, QStandardPaths, Signal
 from PySide6.QtWidgets import QWidget, QMessageBox, QInputDialog, QDialogButtonBox
 
 from .list_move import ListMoveController
@@ -14,7 +14,7 @@ from ui import Ui_RepoConfigPage
 
 class RepoConfigController:
     class Signals(QObject):
-        pass
+        repos_updated = Signal()
 
     def __init__(self,
                  config: 'config.ConfigManager',
@@ -27,6 +27,7 @@ class RepoConfigController:
         self.repo_cmds = repo_cmds
         self.self_cmds = self_cmds
         self.git_cloner = git_cloner
+        self.signals = self.Signals()
 
         # used for cloning dialog
         self.last_dir = self.get_default_dir()
@@ -50,7 +51,7 @@ class RepoConfigController:
         self.ui.delete_.clicked.connect(lambda _: self.delete_remote_dialog())
         self.ui.remote_list.itemSelectionChanged.connect(lambda: self.update_delete_button())
         self.ui.apply.clicked.connect(lambda _: self.apply())
-        self.ui.reset.clicked.connect(lambda _: self.populate_lists())
+        self.ui.reset.clicked.connect(lambda _: self.discard())
 
     def replace_ssh(self,
                     repo_cmds: 'api.commands.RepoPackage',
@@ -100,6 +101,7 @@ class RepoConfigController:
         self.last_dir = path
 
     def discard(self):
+        self.populate_lists()
         self.list_move.reset_diff()
 
     def create_remote_dialog(self):
@@ -200,8 +202,9 @@ class RepoConfigController:
                     self.widget.tr('Success'),
                     self.widget.tr('Repositories were deleted successfully')
             )
+        self.signals.repos_updated.emit()
 
-    def remote_clone(self, repos: list['config.Repo']):
+    def remote_clone(self, repos: list['common.Repo']):
         not_cloned = set()
         for repo in repos:
             try:
@@ -221,6 +224,7 @@ class RepoConfigController:
                     self.widget.tr('Success'),
                     self.widget.tr('Repositories were cloned successfully')
             )
+        self.signals.repos_updated.emit()
         self.populate_lists()
 
     def update_delete_button(self):

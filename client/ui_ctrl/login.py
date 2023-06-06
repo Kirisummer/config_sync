@@ -1,15 +1,16 @@
 from dataclasses import dataclass, field
 
-from api.ssh import SSH, SSHCreds
-from api.commands import SelfPackage
-from ui import Ui_Login
-
 from PySide6.QtCore import Signal, QObject
 from PySide6.QtWidgets import QWidget
 
+from api.ssh import SSH, SSHCreds
+from api.commands import SelfPackage
+from common import Role
+from ui import Ui_Login
+
 class LoginController:
     class Signals(QObject):
-        logged_in = Signal((str, SSH))
+        logged_in = Signal((Role, SSHCreds))
 
     def __init__(self, config: 'config.ConfigManager'):
         super().__init__()
@@ -28,7 +29,7 @@ class LoginController:
         creds = self.get_ui_creds(self.ui)
         ssh = SSH.get(creds)
         self_pkg = SelfPackage(ssh)
-        role = self_pkg.role()
+        role = Role(self_pkg.role())
         self.config.save_creds(creds)
         self.signals.logged_in.emit(role, creds)
 

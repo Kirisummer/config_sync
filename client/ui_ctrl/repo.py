@@ -48,7 +48,7 @@ class RepoPageController:
                 lambda file_path, _: self.file_switched(file_path)
         )
 
-    def set_repo(self, repo: 'api.git.Repo'):
+    def set_repo(self, repo: 'api.git.GitRepo'):
         self.repo = repo
         self.change_controller.set_repo(repo)
 

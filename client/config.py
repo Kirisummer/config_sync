@@ -6,20 +6,16 @@ from itertools import starmap
 from typing import ClassVar, TypedDict
 
 from api.ssh import SSHCreds
+from common import Repo
 
 import tomlkit
 from PySide6.QtCore import QReadWriteLock
 
+LOGGER = getLogger(__file__)
+
 UserConfig = TypedDict('UserConfig', {'login': str, 'host': str, 'port': int})
 RepoConfig = dict[str, str]
 Config = TypedDict('Config', {'user': UserConfig, 'repos': RepoConfig})
-
-LOGGER = getLogger(__file__)
-
-@dataclass(frozen=True)
-class Repo:
-    name: str
-    path: 'Path'
 
 @dataclass(frozen=True)
 class ConfigManager:

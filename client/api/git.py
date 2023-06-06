@@ -12,7 +12,7 @@ def get_ssh_cmd(cmd_bits: 'SSHCmdBits', creds: 'SSHCreds'):
 
 class GitRepo:
     def __init__(self,
-                 repo: 'config.Repo',
+                 repo: 'commit.Repo',
                  creds: SSHCreds,
                  cmd_bits: SSHCmdBits):
         self.repo = Repo(repo.path)
@@ -20,7 +20,7 @@ class GitRepo:
         self.ssh_cmd = get_ssh_cmd(cmd_bits, creds)
 
     @classmethod
-    def get(cls, repo: 'config.Repo', creds: SSHCreds):
+    def get(cls, repo: 'commit.Repo', creds: SSHCreds):
         return cls(repo, creds, SSHCmdBits.get())
 
     def head(self):
@@ -68,7 +68,7 @@ class GitCloner:
     def get(cls, creds: SSHCreds):
         return cls(SSHCmdBits.get(), creds)
 
-    def clone(self, repo: 'config.Repo'):
+    def clone(self, repo: 'commit.Repo'):
         repo_url = get_repo_url(self.creds, repo.name)
         Repo.clone_from(
                 repo_url,
