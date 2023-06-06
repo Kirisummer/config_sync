@@ -20,7 +20,7 @@ cp "${ROOT_DIR}/passwd/"* /etc || true
 owner_dir="${ROOT_DIR}/users/${OWNER_USER}"
 if ! [ -d "$owner_dir" ]; then
     cp -r "${ROOT_DIR}/dir_skel" "$owner_dir"
-    rmdir "${owner_dir}/repos"
+    rm -rd "${owner_dir}/repos"
     ln -s "${ROOT_DIR}/repos" "${owner_dir}/repos"
     chown "${OWNER_USER}:${OWNER_GRP}" "$owner_dir"
 fi
