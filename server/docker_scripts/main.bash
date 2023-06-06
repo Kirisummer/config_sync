@@ -25,6 +25,10 @@ if ! [ -d "$owner_dir" ]; then
     chown "${OWNER_USER}:${OWNER_GRP}" "$owner_dir"
 fi
 
+# Update permissions for VITAL directories
+chmod -R 775 "${ROOT_DIR}/repos"
+chown -R "${OWNER_USER}:${ADMIN_GRP}" "${ROOT_DIR}/repos"
+
 # Run ssh service
 service ssh start
 

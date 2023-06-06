@@ -5,4 +5,4 @@ name="$1"
 source __validation
 validate_repo_name "$name"
 
-rm --recurse --dir "${ROOT_DIR}/repos/${name}"
+rm -rd "${ROOT_DIR}/repos/${name}"
