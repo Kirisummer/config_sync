@@ -10,6 +10,14 @@ validate_login() {
     fi
 }
 
+validate_passwd() {
+    local passwd="$1"
+    if [ -z "$passwd" ]; then
+        printf '%s: Invalid password: pass=`%s`' "$0" "$passwd" >&2
+        false
+    fi
+}
+
 validate_repo_name() {
     local repo="$1"
     if ! ( grep -qE '^([[:alnum:]]|[ _.-])+$' <<< "$repo" ); then
