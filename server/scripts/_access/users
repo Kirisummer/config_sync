@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+repo="$1"
+
+source __validation
+validate_repo_name "$repo"
+check_repo_exists "$repo"
+
+# find repo in users repo directories and filter out names, then sort
+find -L "${ROOT_DIR}/users" -path "${ROOT_DIR}/users/*/repos/${repo}" -printf '%f\n' | \
+    sed "s|^${ROOT_DIR}/users/||;s|/repos/${repo}\$||" | \
+    sort
