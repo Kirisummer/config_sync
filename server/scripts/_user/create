@@ -16,4 +16,5 @@ sudo useradd \
     --no-user-group \
     --groups "$USER_GRP" \
     "$login"
+sudo chmod 775 "$homedir"
 sudo chpasswd <<< "$login:$password"

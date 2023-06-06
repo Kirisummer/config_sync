@@ -2,4 +2,5 @@ Cmnd_Alias    USER_ADMIN = \
                         /usr/sbin/useradd,  \
                         /usr/sbin/chpasswd, \
                         /usr/sbin/userdel,  \
-                        /usr/bin/gpasswd
+                        /usr/bin/gpasswd,   \
+                        /usr/bin/chmod
