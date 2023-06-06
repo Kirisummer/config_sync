@@ -16,7 +16,7 @@ make_pkg() {
 
 # Helpers
 chmod 550 __*
-chown "$OWNER_USER":"$OWNER_GRP" __*
+chown "$OWNER_USER":"$USER_GRP" __*
 
 # Packages themselves
 make_pkg self   "$USER_GRP"
