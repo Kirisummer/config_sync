@@ -3,7 +3,7 @@ from .changes import ChangeController
 
 from bigtree import list_to_tree, preorder_iter
 from PySide6.QtCore import QObject, Qt
-from PySide6.QtWidgets import QWidget, QHeaderView, QTreeWidgetItem
+from PySide6.QtWidgets import QWidget, QTreeWidgetItem
 
 from api.git import GitRepo
 from config import Repo
@@ -34,11 +34,6 @@ class RepoPageController:
                 self.ui.changes, self.ui.head_select, self.repo)
         self.ui.commit_msg_widget.hide()
         self.ui.diff_widget.hide()
-
-        # vertical header size
-        header = self.ui.changes.verticalHeader()
-        header.setFixedWidth(70)
-        header.setSectionResizeMode(QHeaderView.Fixed)
 
         # actions
         self.change_controller.signals.change_switched.connect(

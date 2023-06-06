@@ -2,12 +2,16 @@ from dataclasses import dataclass, field
 from typing import ClassVar
 
 from PySide6.QtCore import QObject, Qt, QPoint, Signal, Slot
-from PySide6.QtWidgets import QMenu, QMessageBox, QTableWidgetItem
+from PySide6.QtWidgets import QMenu, QMessageBox, QTableWidgetItem, QHeaderView
 
 class ChangeController:
     class Signals(QObject):
         checked_out = Signal(str)
         change_switched = Signal(str)
+
+    HEAD_MARKER = '*'
+    HEAD_COL = 0
+    SUMMARY_COL = 1
 
     def __init__(self,
                  changes: 'QTableWidget',
@@ -16,6 +20,12 @@ class ChangeController:
         self.changes = changes
         self.heads = heads
         self.repo = repo
+
+        # vertical header sizes
+        header = self.changes.verticalHeader()
+        header.setFixedWidth(70)
+        header.setSectionResizeMode(QHeaderView.Fixed)
+        self.changes.setColumnWidth(self.HEAD_COL, 20)
 
         self.populate_heads()
         self.heads.currentTextChanged.connect(lambda head: self.populate_commits(head))
@@ -43,12 +53,17 @@ class ChangeController:
 
     def populate_commits(self, revision):
         self.changes.setRowCount(0)
+        head_hash = self.repo.head()
         for commit_hash, summary in self.repo.revision_log(revision):
             row_idx = self.changes.rowCount()
             self.changes.insertRow(row_idx)
             self.changes.setVerticalHeaderItem(row_idx, QTableWidgetItem(commit_hash))
             item = QTableWidgetItem(summary)
-            self.changes.setItem(row_idx, 0, QTableWidgetItem(summary))
+            self.changes.setItem(row_idx, self.SUMMARY_COL, QTableWidgetItem(summary))
+            if commit_hash == head_hash:
+                self.changes.setItem(
+                        row_idx, self.HEAD_COL, QTableWidgetItem(self.HEAD_MARKER))
+
 
     def checkout(self, revision):
         result = QMessageBox.question(
