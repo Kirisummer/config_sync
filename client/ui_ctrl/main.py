@@ -4,7 +4,7 @@ from api.commands import RepoPackage, SelfPackage
 from api.ssh import SSH
 from api.git import GitRepo, GitCloner
 from ui import Ui_MainWindow
-from .repo_config import RepoConfigController
+from .config import RepoConfigController
 from .repo import RepoPageController
 
 class MainController:
