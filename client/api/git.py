@@ -38,7 +38,7 @@ class GitRepo:
         commit = self.repo.rev_parse(revision)
         return list(commit.stats.files), commit.message
 
-    def discard_local(self, revision):
+    def discard_local(self):
         self.repo.git.restore('--staged', '.')
         self.repo.git.checkout('--', '.')
 

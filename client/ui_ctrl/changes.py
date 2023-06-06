@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from functools import partial
 from typing import ClassVar
 
 from PySide6.QtCore import QObject, Qt, QPoint, Signal, Slot
@@ -30,6 +31,8 @@ class ChangeController:
         self.populate_heads()
         self.heads.currentTextChanged.connect(lambda head: self.populate_commits(head))
         self.changes.itemSelectionChanged.connect(lambda: self.handle_commit_change())
+        self.changes.customContextMenuRequested.connect(
+                lambda pos: self.handle_context_menu(pos))
         self.populate_commits(self.heads.currentText()) # populate with HEAD
         self.signals = self.Signals()
 
@@ -52,6 +55,9 @@ class ChangeController:
         self.heads.addItems(self.repo.branches())
 
     def populate_commits(self, revision):
+        if not revision:
+            return
+
         self.changes.setRowCount(0)
         head_hash = self.repo.head()
         for commit_hash, summary in self.repo.revision_log(revision):
@@ -67,17 +73,21 @@ class ChangeController:
 
     def checkout(self, revision):
         result = QMessageBox.question(
-                parent=self.changes,
-                title=self.changes.tr('Checkout'),
-                text=self.changes.tr('Your changes will be discarded. Checkout ') + revision + '?'
+                self.changes,
+                self.changes.tr('Checkout'),
+                ''.join((
+                    self.changes.tr('Your changes will be discarded. Checkout'),
+                    ' ', revision, '?'
+                ))
         )
         if result == QMessageBox.StandardButton.Yes:
             self.repo.checkout(revision)
+            self.populate_heads()
             self.signals.checked_out.emit(revision)
 
     def handle_context_menu(self, pos: QPoint):
-        item = self.changes.itemAt(pos)
+        row = self.changes.rowAt(pos.y())
         revision = self.changes.verticalHeaderItem(row).text()
         menu = QMenu(self.changes)
         menu.addAction(self.changes.tr('Checkout'), partial(self.checkout, revision=revision))
-        menu.exec(pos)
+        menu.exec(self.changes.mapToGlobal(pos))
