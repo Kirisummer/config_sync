@@ -3,14 +3,15 @@ class CommandError(RuntimeError):
     ERR_MSG = 'Unknown error'
 
     def __init__(self, *args, **kw):
+        print(args, kw)
         msg = ''.join((
             self.ERR_MSG, ': ',
             ', '.join((
-                *args,
+                *map(str, args),
                 *map(self.pair_msg, kw.items())
             ))
         ))
-        super.__init__(msg, *kw.values())
+        super().__init__(msg, *kw.values())
 
     @staticmethod
     def pair_msg(pair):
@@ -20,7 +21,7 @@ class CommandError(RuntimeError):
 class LoginError(CommandError):
     ERR_MSG = 'Unknown login error'
     def __init__(self, login):
-        super.__init__(login=login)
+        super().__init__(login=login)
         self.login = login
 
 class InvalidLoginError(LoginError):
@@ -42,7 +43,7 @@ class UserIsAdminError(LoginError):
 class RepoError(CommandError):
     ERR_MSG = 'Unknown repo error'
     def __init__(self, repo):
-        super.__init__(repo=repo)
+        super().__init__(repo=repo)
         self.repo = repo
 
 class InvalidRepoNameError(RepoError):
@@ -58,7 +59,7 @@ class RepoExistsError(RepoError):
 class AccessError(CommandError):
     ERR_MSG = 'Unknown access error'
     def __init__(self, login, repo):
-        super.__init__(login=login, repo=repo)
+        super().__init__(login=login, repo=repo)
         self.login = login
         self.repo = repo
 

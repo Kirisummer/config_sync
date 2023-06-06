@@ -1,8 +1,9 @@
-from .command_error import *
-
 from inspect import getmembers, ismethod
 from dataclasses import dataclass
 from functools import wraps
+import re
+
+from .command_error import *
 
 @dataclass(frozen=True)
 class Package:
@@ -64,23 +65,23 @@ def table_request(method):
 
 def parse_and_raise(res: 'CompletedProcess'):
     ''' Try to parse specific exception, fallback to CommandError(stderr) '''
+    stderr = res.stderr.decode('utf-8')
     try:
         # error caught by validator
-        cmd, msg, args = res.stderr.split(': ', 2)
+        cmd, msg, args = stderr.split(': ', 2)
         ex_type = SPECIFIC_MAP.get(msg, None)
         args = parse_args(args)
     except ValueError:
-        ex_type, args = None
-    if ex_type and args:
-        raise ex_type(args)
-    else:
-        raise CommandError(res.stderr)
+        ex_type, args = CommandError, (stderr,)
+    raise ex_type(**args)
 
 def parse_args(arg_string: str):
     ''' Parse exception arguments '''
+    breakpoint()
     def parse_pair(pair_str):
-        name, login = re.match(r'(\w+)=`(.+)').groups()
+        name, value = re.match(r'(\w+)=`(.+)`', pair_str).groups()
+        return name, value
     return {
             name: value
-            for name, value in map(parse_pair, arg_string.split('` '))
+            for name, value in map(parse_pair, arg_string.split(' '))
     }
