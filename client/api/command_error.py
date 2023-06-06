@@ -39,6 +39,13 @@ class UserNotAdminError(LoginError):
 class UserIsAdminError(LoginError):
     ERR_MSG = 'Is admin'
 
+# Password error
+class InvalidPasswordError(CommandError):
+    ERR_MSG = 'Invalid password'
+    def __init__(self, passwd):
+        super().__init__(passwd=passwd)
+        self.passwd = passwd
+
 # Repo errors
 class RepoError(CommandError):
     ERR_MSG = 'Unknown repo error'
@@ -75,9 +82,12 @@ SPECIFIC = [
     UserExistsError,
     UserNotAdminError,
     UserIsAdminError,
+    InvalidPasswordError,
     InvalidRepoNameError,
     RepoNotFoundError,
-    RepoExistsError
+    RepoExistsError,
+    RepoAllowedError,
+    RepoNotAllowedError,
 ]
 SPECIFIC_MAP = {
         ex.ERR_MSG: ex

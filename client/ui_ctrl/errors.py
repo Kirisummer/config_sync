@@ -6,6 +6,7 @@ from api.command_error import (
     UserExistsError,
     UserNotAdminError,
     UserIsAdminError,
+    InvalidPasswordError,
     InvalidRepoNameError,
     RepoNotFoundError,
     RepoExistsError,
@@ -29,6 +30,7 @@ ERROR_TABLE = {
         UserExistsError:      'User {} already exists on the server',
         UserNotAdminError:    'User {} is not an admin',
         UserIsAdminError:     'User {} is an admin',
+        InvalidPasswordError: 'Invalid password: {}',
         InvalidRepoNameError: 'Repository name {} is not valid. ' \
                               'Repository name may consist of letters, ' \
                               'numbers, spaces and symbols "_.-"',

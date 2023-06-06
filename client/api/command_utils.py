@@ -77,7 +77,6 @@ def parse_and_raise(res: 'CompletedProcess'):
 
 def parse_args(arg_string: str):
     ''' Parse exception arguments '''
-    breakpoint()
     def parse_pair(pair_str):
         name, value = re.match(r'(\w+)=`(.+)`', pair_str).groups()
         return name, value

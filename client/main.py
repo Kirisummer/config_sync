@@ -26,7 +26,8 @@ class Application(QApplication):
 
 if __name__ == '__main__':
     app = Application(sys.argv)
-    app.login.ui.password.setText(sys.argv[1])
-    app.login.ui.login_button.click()
+    if len(sys.argv) > 1:
+        app.login.ui.password.setText(sys.argv[1])
+        app.login.ui.login_button.click()
     sys.exit(app.run())
 

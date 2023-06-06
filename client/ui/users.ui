@@ -39,7 +39,7 @@
       </widget>
      </item>
      <item row="2" column="0" colspan="2">
-      <widget class="QListWidget" name="user_list"/>
+      <widget class="QListWidget" name="users"/>
      </item>
     </layout>
    </item>
@@ -59,21 +59,21 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="create_button">
+      <widget class="QPushButton" name="create">
        <property name="text">
         <string>Create</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="delete_button">
+      <widget class="QPushButton" name="delete_">
        <property name="text">
         <string>Delete</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="passwd_button">
+      <widget class="QPushButton" name="passwd">
        <property name="text">
         <string>Change
 password</string>
@@ -81,7 +81,7 @@ password</string>
       </widget>
      </item>
      <item>
-      <widget class="QDialogButtonBox" name="button_box">
+      <widget class="QDialogButtonBox" name="accept">
        <property name="standardButtons">
         <set>QDialogButtonBox::Ok</set>
        </property>
@@ -97,10 +97,10 @@ password</string>
  <tabstops>
   <tabstop>search_box</tabstop>
   <tabstop>search_button</tabstop>
-  <tabstop>user_list</tabstop>
-  <tabstop>create_button</tabstop>
-  <tabstop>delete_button</tabstop>
-  <tabstop>passwd_button</tabstop>
+  <tabstop>users</tabstop>
+  <tabstop>create</tabstop>
+  <tabstop>delete_</tabstop>
+  <tabstop>passwd</tabstop>
  </tabstops>
  <resources/>
  <connections/>

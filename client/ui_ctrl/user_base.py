@@ -92,7 +92,12 @@ class UserControllerBase:
             if passwd:
                 try:
                     self.user_cmds.passwd(login, passwd)
-                except (InvalidLoginError, UserIsAdminError, CommandError) as ex:
+                except (
+                        InvalidLoginError,
+                        InvalidPasswordError,
+                        UserIsAdminError,
+                        CommandError
+                ) as ex:
                     show_error(self.dialog, ex)
                 else:
                     QMessageBox.information(

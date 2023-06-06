@@ -3,6 +3,7 @@ from PySide6.QtCore import QObject, Slot
 from .config import RepoConfigController
 from .repo import RepoPageController
 from .user_owner import OwnerUserController
+from .user_admin import AdminUserController
 
 from api.commands import AdminPackage, RepoPackage, SelfPackage, UserPackage
 from api.ssh import SSH
@@ -91,5 +92,7 @@ class MainController:
         match self.role:
             case Role.Owner:
                 return OwnerUserController(UserPackage(ssh), AdminPackage(ssh))
+            case Role.Admin:
+                return AdminUserController(UserPackage(ssh))
             case role:
                 raise NotImplementedError(f'Unsupported role: {role}')
