@@ -15,8 +15,12 @@ class AccessPackage(Package):
         return self._ssh('deny', login, repo)
 
     @list_request
-    def list(self, login: str):
-        return self._ssh('list', login)
+    def repos(self, login: str):
+        return self._ssh('repos', login)
+
+    @list_request
+    def users(self, repo: str):
+        return self._ssh('users', repo)
 
 class AdminPackage(Package):
     def __init__(self, ssh: 'SSH'):

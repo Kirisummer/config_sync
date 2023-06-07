@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>RepoUsers</class>
- <widget class="QWidget" name="RepoUsers">
+ <widget class="QDialog" name="RepoUsers">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -52,7 +52,17 @@
       </widget>
      </item>
      <item row="2" column="0" colspan="2">
-      <widget class="QListWidget" name="allowed_list"/>
+      <widget class="QListWidget" name="allowed">
+       <property name="showDropIndicator" stdset="0">
+        <bool>false</bool>
+       </property>
+       <property name="defaultDropAction">
+        <enum>Qt::IgnoreAction</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
+      </widget>
      </item>
      <item row="0" column="0" colspan="2">
       <widget class="QLabel" name="allowed_label">
@@ -84,32 +94,30 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="move_right_button">
+      <widget class="QPushButton" name="deny">
        <property name="text">
         <string>&gt;&gt;&gt;</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="move_left_button">
+      <widget class="QPushButton" name="allow">
        <property name="text">
         <string>&lt;&lt;&lt;</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QDialogButtonBox" name="button_box">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <widget class="QPushButton" name="apply">
+       <property name="text">
+        <string>Apply</string>
        </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="standardButtons">
-        <set>QDialogButtonBox::Apply|QDialogButtonBox::Reset</set>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="reset">
+       <property name="text">
+        <string>Reset</string>
        </property>
       </widget>
      </item>
@@ -153,7 +161,17 @@
       </widget>
      </item>
      <item row="3" column="0" colspan="2">
-      <widget class="QListWidget" name="denied_list"/>
+      <widget class="QListWidget" name="denied">
+       <property name="showDropIndicator" stdset="0">
+        <bool>false</bool>
+       </property>
+       <property name="defaultDropAction">
+        <enum>Qt::IgnoreAction</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -175,12 +193,12 @@
  <tabstops>
   <tabstop>allowed_search_box</tabstop>
   <tabstop>allowed_search_button</tabstop>
-  <tabstop>allowed_list</tabstop>
-  <tabstop>move_right_button</tabstop>
-  <tabstop>move_left_button</tabstop>
+  <tabstop>allowed</tabstop>
+  <tabstop>deny</tabstop>
+  <tabstop>allow</tabstop>
   <tabstop>denied_search_box</tabstop>
   <tabstop>denied_search_button</tabstop>
-  <tabstop>denied_list</tabstop>
+  <tabstop>denied</tabstop>
  </tabstops>
  <resources/>
  <connections/>

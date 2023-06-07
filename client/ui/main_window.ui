@@ -38,14 +38,14 @@
      <height>23</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuAccount">
+   <widget class="QMenu" name="account_menu">
     <property name="title">
      <string>Account</string>
     </property>
     <addaction name="self_passwd"/>
     <addaction name="self_log_out"/>
    </widget>
-   <widget class="QMenu" name="menuRepository">
+   <widget class="QMenu" name="repo_menu">
     <property name="title">
      <string>Repository</string>
     </property>
@@ -53,15 +53,15 @@
     <addaction name="repo_push"/>
     <addaction name="repo_users"/>
    </widget>
-   <widget class="QMenu" name="menuUsers">
+   <widget class="QMenu" name="users_menu">
     <property name="title">
      <string>Users</string>
     </property>
     <addaction name="users_manage"/>
    </widget>
-   <addaction name="menuAccount"/>
-   <addaction name="menuRepository"/>
-   <addaction name="menuUsers"/>
+   <addaction name="account_menu"/>
+   <addaction name="repo_menu"/>
+   <addaction name="users_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="self_passwd">

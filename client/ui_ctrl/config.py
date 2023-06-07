@@ -14,6 +14,7 @@ from api.command_error import (
         RepoExistsError, InvalidRepoNameError, RepoNotFoundError, CommandError
 )
 from api.git import GitCommandError
+from common import bullet_list
 from ui import Ui_RepoConfigPage
 
 class RepoConfigController:
@@ -125,7 +126,7 @@ class RepoConfigController:
 
         if self.list_move:
             self.list_move.disconnect()
-        self.list_move = ListMoveController('config',
+        self.list_move = ListMoveController(
                 self.ui.local_list, self.ui.to_remotes,
                 self.ui.remote_list, self.ui.to_locals
         )
@@ -149,7 +150,6 @@ class RepoConfigController:
 
     def discard(self):
         self.populate_lists()
-        self.list_move.reset_diff()
 
     def create_remote_dialog(self):
         remote_name, ok = QInputDialog.getText(
@@ -184,7 +184,7 @@ class RepoConfigController:
                 show_error(self.widget, ex)
 
     def local_delete_dialog(self, local_delete: set[str]):
-        repo_text = self.bullet_list(local_delete)
+        repo_text = bullet_list(local_delete)
         return QMessageBox.question(
                 self.widget,
                 self.widget.tr('Local repository deletion'),
@@ -209,10 +209,10 @@ class RepoConfigController:
             msg = []
             if not_deleted:
                 msg.append(self.widget.tr('Following repositories were not deleted:'))
-                msg.append(self.bullet_list(not_deleted))
+                msg.append(bullet_list(not_deleted))
             if not_found:
                 msg.append(self.widget.tr('Following repositories were not found:'))
-                msg.append(self.bullet_list(not_found))
+                msg.append(bullet_list(not_found))
             QMessageBox.critical(
                     self.widget,
                     self.widget.tr('Deletion error'),
@@ -243,7 +243,7 @@ class RepoConfigController:
             QMessageBox.critical(
                     self.widget,
                     self.widget.tr('Cloning failed'),
-                    self.widget.tr('Failed to clone repositories:') + self.bullet_list(not_cloned)
+                    self.widget.tr('Failed to clone repositories:') + bullet_list(not_cloned)
             )
         else:
             QMessageBox.information(
@@ -257,10 +257,6 @@ class RepoConfigController:
     def update_delete_button(self):
         remote_selection = self.ui.remote_list.selectedItems()
         self.ui.delete_.setEnabled(bool(remote_selection))
-
-    @staticmethod
-    def bullet_list(repos: set[str]):
-        return ''.join((f'\n  - {repo}' for repo in repos))
 
     @staticmethod
     def get_default_dir():

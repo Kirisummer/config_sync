@@ -22,7 +22,7 @@ class ListMoveController:
             self.control.move(self.control.Direction.Right)
 
         @Slot(bool)
-        def left_move(self, cliecked):
+        def left_move(self, clicked):
             self.control.move(self.control.Direction.Left)
 
     class Direction(Enum):
@@ -38,10 +38,9 @@ class ListMoveController:
         button: 'QPushButton'
         moved: set = field(default_factory=set, init=False)
 
-    def __init__(self, name,
+    def __init__(self,
                  left_list, left_move,
                  right_list, right_move):
-        self.name = name
         self.items = {
                 self.Direction.Left: self.Item(left_list, left_move),
                 self.Direction.Right: self.Item(right_list, right_move)

@@ -17,7 +17,6 @@ class Package:
 def handle_fail(method, *args, **kw):
     ''' Handle possible failure or return call result '''
     res = method(*args, **kw)
-    print(res)
     if not res.returncode:
         return res
     parse_and_raise(res)
@@ -72,9 +71,9 @@ def parse_and_raise(res: 'CompletedProcess'):
         cmd, msg, args = stderr.split(': ', 2)
         ex_type = SPECIFIC_MAP.get(msg, None)
         args = parse_args(args)
+        raise ex_type(**args)
     except ValueError:
-        ex_type, args = CommandError, (stderr,)
-    raise ex_type(**args)
+        raise CommandError(stderr)
 
 def parse_args(arg_string: str):
     ''' Parse exception arguments '''

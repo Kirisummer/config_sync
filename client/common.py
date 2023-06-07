@@ -13,3 +13,6 @@ class Role(Enum):
 
     def is_admin(self):
         return self != self.User
+
+def bullet_list(items: list[str]):
+    return '\n'.join((f'  - {item}' for item in items))

@@ -33,8 +33,8 @@ class AdminUserController(UserControllerBase):
         def update_user_buttons(self):
             self.control.update_user_buttons()
 
-    def __init__(self, user_cmds: 'api.commands.UserPackage'):
-        super().__init__(QDialog(), user_cmds)
+    def __init__(self, parent: 'QWidget', user_cmds: 'api.commands.UserPackage'):
+        super().__init__(QDialog(parent), user_cmds)
         self.ui = Ui_UsersAdmin()
         self.ui.setupUi(self.dialog)
         self.admin_signals = self.AdminSignals(self)

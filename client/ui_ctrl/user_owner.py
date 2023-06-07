@@ -12,6 +12,7 @@ from api.command_error import (
         UserNotAdminError,
         CommandError,
 )
+from common import bullet_list
 from ui import Ui_UsersOwner
 
 class OwnerUserController(UserControllerBase):
@@ -51,9 +52,10 @@ class OwnerUserController(UserControllerBase):
             self.control.update_user_buttons()
 
     def __init__(self,
+                 parent: 'QWidget',
                  user_cmds: 'api.commands.UserPackage',
                  admin_cmds: 'api.commands.AdminPackage'):
-        super().__init__(QDialog(), user_cmds)
+        super().__init__(QDialog(parent), user_cmds)
         self.admin_cmds = admin_cmds
 
         self.ui = Ui_UsersOwner()
@@ -83,7 +85,7 @@ class OwnerUserController(UserControllerBase):
         else:
             if self.list_move:
                 self.list_move.disconnect()
-            self.list_move = ListMoveController('users',
+            self.list_move = ListMoveController(
                     self.ui.users, self.ui.to_admins,
                     self.ui.admins, self.ui.to_users,
             )
@@ -95,10 +97,10 @@ class OwnerUserController(UserControllerBase):
         msg = []
         if to_promote:
             msg.append(self.dialog.tr('Users to promote:'))
-            msg.append(self.bullet_list(to_promote))
+            msg.append(bullet_list(to_promote))
         if to_demote:
             msg.append(self.dialog.tr('Admins to demote:'))
-            msg.append(self.bullet_list(to_demote))
+            msg.append(bullet_list(to_demote))
 
         ok = QMessageBox.question(
                 self.dialog,
@@ -122,7 +124,3 @@ class OwnerUserController(UserControllerBase):
         users_selection = self.ui.users.selectedItems()
         self.ui.delete_.setEnabled(bool(users_selection))
         self.ui.passwd.setEnabled(bool(users_selection))
-
-    @staticmethod
-    def bullet_list(users: set[str]):
-        return ''.join((f'\n  - {user}' for user in users))
