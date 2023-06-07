@@ -1,3 +1,4 @@
+gitpython
 PySide6
 bigtree
 tomlkit
