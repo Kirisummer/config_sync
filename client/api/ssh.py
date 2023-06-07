@@ -41,9 +41,9 @@ class SSHCmdBits:
     @staticmethod
     def get_win_ssh_cmd():
         return SSHCmdBits(
-                (environ.get('PLINK_PATH', 'plink'), '-pw'),
+                ('plink', '-pw'),
                 ('-ssh',),
-                '-p'
+                '-P'
         )
 
 @dataclass(frozen=True)
