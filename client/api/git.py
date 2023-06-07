@@ -60,8 +60,22 @@ class GitRepo:
         ).split('\n', 5)
         return diff_lines[-1]
 
+    def pull(self):
+        with self.repo.git.custom_environment(GIT_SSH_COMMAND=' '.join(self.ssh_cmd)):
+            self.repo.git.pull('--all')
+
+    def push(self, ref):
+        with self.repo.git.custom_environment(GIT_SSH_COMMAND=' '.join(self.ssh_cmd)):
+            self.repo.git.push(ref.split('/'))
+
     def branches(self):
-        return list(branch.name for branch in self.repo.branches)
+        return [branch.name for branch in self.repo.branches]
+
+    def refs(self):
+        return [ref.name for ref in self.repo.remote().refs]
+
+    def remote(self):
+        return self.repo.remote().name
 
 class GitCloner:
     def __init__(self,

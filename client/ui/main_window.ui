@@ -49,7 +49,7 @@
     <property name="title">
      <string>Repository</string>
     </property>
-    <addaction name="repo_fetch"/>
+    <addaction name="repo_pull"/>
     <addaction name="repo_push"/>
     <addaction name="repo_users"/>
    </widget>
@@ -74,9 +74,9 @@
     <string>Log Out</string>
    </property>
   </action>
-  <action name="repo_fetch">
+  <action name="repo_pull">
    <property name="text">
-    <string>Fetch</string>
+    <string>Pull</string>
    </property>
   </action>
   <action name="repo_push">

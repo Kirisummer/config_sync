@@ -3,9 +3,9 @@ from .changes import ChangeController
 
 from bigtree import list_to_tree, preorder_iter
 from PySide6.QtCore import QObject, Qt, Slot
-from PySide6.QtWidgets import QWidget, QTreeWidgetItem
+from PySide6.QtWidgets import QWidget, QTreeWidgetItem, QInputDialog, QMessageBox
 
-from api.git import GitRepo
+from api.git import GitRepo, GitCommandError
 from config import Repo
 from ui.repo import Ui_RepoPage
 
@@ -57,6 +57,58 @@ class RepoPageController:
     def set_repo(self, repo: 'api.git.GitRepo'):
         self.repo = repo
         self.change_controller.set_repo(repo)
+
+    def process_pull(self):
+        try:
+            self.repo.pull()
+        except GitCommandError as ex:
+            QMessageBox.critical(
+                    self.widget,
+                    self.widget.tr('Git error'),
+                    ex.message
+            )
+        else:
+            QMessageBox.information(
+                    self.widget,
+                    self.widget.tr('Pull complete'),
+                    self.widget.tr('Pull was completed successfully')
+            )
+        self.change_controller.populate_heads()
+
+    def process_push(self):
+        if not self.repo.head():
+            QMessageBox.critical(
+                    self.widget,
+                    self.widget.tr('Empty repository'),
+                    self.widget.tr('Cannot push: the repository is empty')
+            )
+            return
+        refs = set(self.repo.refs())
+        remote = self.repo.remote()
+        for branch in self.repo.branches():
+            refs.add(f'{remote}/{branch}')
+        ref, ok = QInputDialog.getItem(
+                self.widget,
+                self.widget.tr('Push'),
+                self.widget.tr('Push to:'),
+                refs, editable=False
+        )
+        if ok and ref:
+            try:
+                self.repo.push(ref)
+            except GitCommandError as ex:
+                QMessageBox.critical(
+                        self.widget,
+                        self.widget.tr('Git error'),
+                        ex.message
+                )
+            else:
+                QMessageBox.information(
+                        self.widget,
+                        self.widget.tr('Success'),
+                        self.widget.tr('Pushed successfully')
+                )
+        self.change_controller.populate_heads()
 
     def change_switched(self, revision):
         files, commit_msg = self.repo.commit_stat(revision)

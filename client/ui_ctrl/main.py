@@ -38,6 +38,14 @@ class MainController:
         def check_enable_repo_menu(self, row):
             self.control.check_enable_repo_menu(row)
 
+        @Slot()
+        def pull(self):
+            self.control.pull()
+
+        @Slot()
+        def push(self):
+            self.control.push()
+
     CONFIG_TAB = 'Repository management'
 
     def __init__(self,
@@ -57,6 +65,7 @@ class MainController:
                 GitCloner.get(creds),
                 role.is_admin()
         )
+        self.repos = {}
         self.config_tab.signals.repos_updated.connect(self.signals.populate_tabs)
 
     def init_ui(self, window: 'QMainWindow'):
@@ -82,9 +91,11 @@ class MainController:
 
     def populate_tabs(self):
         self.ui.tab_widget.clear()
+        self.repos.clear()
         for repo in self.config.get_repos():
             repo_tab = RepoPageController(repo.name, GitRepo.get(repo, self.creds))
             self.ui.tab_widget.addTab(repo_tab.widget, repo.name)
+            self.repos[repo.name] = repo_tab
         self.ui.tab_widget.addTab(self.config_tab.widget, self.window.tr(self.CONFIG_TAB))
         self.check_enable_repo_menu(self.ui.tab_widget.currentIndex())
 
@@ -92,20 +103,31 @@ class MainController:
         # disable repo menu on config tab
         self.ui.tab_widget.currentChanged.connect(self.signals.check_enable_repo_menu)
 
+        self.ui.repo_pull.triggered.connect(self.signals.pull)
+
         if self.role.is_admin():
             self.ui.users_manage.triggered.connect(self.signals.open_users)
             self.ui.repo_users.triggered.connect(self.signals.open_repo_users)
+            self.ui.repo_push.triggered.connect(self.signals.push)
         else:
-            print('not admin')
             self.ui.users_menu.menuAction().setVisible(False)
             self.ui.repo_users.setVisible(False)
+            self.ui.repo_push.setVisible(False)
 
     def open_users(self):
         users = self.get_user_controller()
         users.dialog.exec()
 
+    def pull(self):
+        repo_page = self.get_current_repo()
+        repo_page.process_pull()
+
+    def push(self):
+        repo_page = self.get_current_repo()
+        repo_page.process_push()
+
     def open_repo_users(self):
-        repo_name = self.ui.tab_widget.tabText(self.ui.tab_widget.currentIndex())
+        repo_name = self.get_current_repo().repo_name
         ssh = SSH.get(self.creds)
         repo_users = RepoUsersController(
                 self.window,
@@ -123,6 +145,13 @@ class MainController:
                 return AdminUserController(self.window, UserPackage(ssh))
             case role:
                 raise NotImplementedError(f'Unsupported role: {role}')
+
+    def get_current_repo(self):
+        idx = self.ui.tab_widget.currentIndex()
+        if idx == self.ui.tab_widget.count() - 1:
+            raise ValueError('Current page is not a repo')
+        repo_name = self.ui.tab_widget.tabText(idx)
+        return self.repos[repo_name]
 
     def check_enable_repo_menu(self, row):
         self.ui.repo_menu.setEnabled(row != self.ui.tab_widget.count() - 1)
