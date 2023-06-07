@@ -10,7 +10,7 @@ from .list_move import ListMoveController
 from .clone import CloneDialogController
 from .errors import show_error
 from .search import ListSearchController
-from api.command_error import (
+from api.commands.error import (
         RepoExistsError, InvalidRepoNameError, RepoNotFoundError, CommandError
 )
 from api.git import GitCommandError

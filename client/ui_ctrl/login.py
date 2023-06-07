@@ -4,7 +4,7 @@ from PySide6.QtCore import Signal, QObject
 from PySide6.QtWidgets import QWidget
 
 from api.ssh import SSH, SSHCreds
-from api.commands import SelfPackage
+from api.commands.packages import SelfPackage
 from common import Role
 from ui import Ui_Login
 

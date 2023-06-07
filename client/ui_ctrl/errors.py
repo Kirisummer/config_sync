@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMessageBox
 
-from api.command_error import (
+from api.commands.error import (
     InvalidLoginError,
     UserNotFoundError,
     UserExistsError,

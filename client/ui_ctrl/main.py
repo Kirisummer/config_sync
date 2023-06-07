@@ -7,10 +7,10 @@ from .user_admin import AdminUserController
 from .user_owner import OwnerUserController
 from .repo_users import RepoUsersController
 
-from api.commands import (
+from api.commands.packages import (
         AdminPackage, AccessPackage, RepoPackage, SelfPackage, UserPackage
 )
-from api.command_error import InvalidPasswordError, CommandError
+from api.commands.error import InvalidPasswordError, CommandError
 from api.ssh import SSH
 from api.git import GitRepo, GitCloner
 from common import Role

@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QDialog, QMessageBox
 from .errors import show_error
 from .list_move import ListMoveController
 from .search import ListSearchController
-from api.command_error import (
+from api.commands.error import (
         InvalidLoginError,
         UserIsAdminError,
         InvalidRepoNameError,

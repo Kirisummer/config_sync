@@ -4,7 +4,7 @@ from PySide6.QtCore import QObject, Slot
 from .errors import show_error
 from .list_move import ListMoveController
 from .user_base import UserControllerBase
-from api.command_error import (
+from api.commands.error import (
         InvalidLoginError, 
         UserExistsError, 
         UserNotFoundError,

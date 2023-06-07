@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QMessageBox, QInputDialog, QLineEdit
 
 from .create_user import CreateUserController
 from .errors import show_error
-from api.command_error import (
+from api.commands.error import (
         InvalidLoginError, 
         UserExistsError, 
         UserNotFoundError,

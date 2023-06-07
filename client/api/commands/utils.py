@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from functools import wraps
 import re
 
-from .command_error import *
+from .error import *
 
 @dataclass(frozen=True)
 class Package:

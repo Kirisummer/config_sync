@@ -1,3 +1,3 @@
 from . import commands
 from . import ssh
-from . import command_error
+from . import git
