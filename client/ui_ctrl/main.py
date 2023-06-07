@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, Slot
+from PySide6.QtCore import QObject, Slot, Signal
 
 from .config import RepoConfigController
 from .repo import RepoPageController
@@ -14,6 +14,8 @@ from ui import Ui_MainWindow
 
 class MainController:
     class Signals(QObject):
+        logged_out = Signal()
+
         def __init__(self, control):
             super().__init__()
             self.control = control
@@ -102,8 +104,8 @@ class MainController:
     def setup_actions(self):
         # disable repo menu on config tab
         self.ui.tab_widget.currentChanged.connect(self.signals.check_enable_repo_menu)
-
         self.ui.repo_pull.triggered.connect(self.signals.pull)
+        self.ui.self_log_out.triggered.connect(self.signals.logged_out)
 
         if self.role.is_admin():
             self.ui.users_manage.triggered.connect(self.signals.open_users)

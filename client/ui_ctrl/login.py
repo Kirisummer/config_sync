@@ -13,14 +13,15 @@ class LoginController:
         logged_in = Signal((Role, SSHCreds))
 
     def __init__(self, config: 'config.ConfigManager'):
-        super().__init__()
-
         self.config = config
-        self.ui = Ui_Login()
-        self.widget = QWidget()
         self.signals = self.Signals()
 
-        self.ui.setupUi(self.widget)
+    def init_ui(self, window: 'QMainWindow'):
+        self.ui = Ui_Login()
+        self.window = window
+        self.window.menuBar().setVisible(False)
+        self.ui.setupUi(self.window)
+
         last_creds = self.config.get_last_creds()
         self.set_ui_creds(self.ui, last_creds)
         self.ui.login_button.clicked.connect(self.handle_login)

@@ -12,17 +12,24 @@ class Application(QApplication):
         super().__init__(argv)
         self.window = QMainWindow()
         self.config = ConfigManager('conf.toml')
-        self.login = LoginController(self.config)
-        self.window.setCentralWidget(self.login.widget)
-        self.login.signals.logged_in.connect(self.on_login)
 
-    def run(self):
-        self.window.show()
-        return self.exec()
+        self.login = LoginController(self.config)
+        self.login.signals.logged_in.connect(self.on_login)
+        self.login.init_ui(self.window)
 
     def on_login(self, role: 'common.Role', creds: 'api.ssh.SSHCreds'):
         self.main = MainController(role, self.config, creds)
         self.main.init_ui(self.window)
+        self.main.signals.logged_out.connect(self.on_logout)
+
+    def on_logout(self):
+        self.main.signals.logged_out.disconnect(self.on_logout)
+        del self.main
+        self.login.init_ui(self.window)
+
+    def run(self):
+        self.window.show()
+        return self.exec()
 
 if __name__ == '__main__':
     app = Application(sys.argv)
