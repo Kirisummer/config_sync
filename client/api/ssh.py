@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from os import environ
 from platform import system
 from subprocess import run
 
@@ -40,7 +41,7 @@ class SSHCmdBits:
     @staticmethod
     def get_win_ssh_cmd():
         return SSHCmdBits(
-                ('plink', '-pw'),
+                (environ.get('PLINK_PATH', 'plink'), '-pw'),
                 ('-ssh',),
                 '-p'
         )
