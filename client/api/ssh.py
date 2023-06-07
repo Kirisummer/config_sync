@@ -9,6 +9,9 @@ class SSHCreds:
     host: str
     port: int
 
+    def change_password(self, password: str):
+        return SSHCreds(self.login, password, self.host, self.port)
+
 @dataclass(frozen=True)
 class SSHCmdBits:
     passwd_pipe: tuple[str]

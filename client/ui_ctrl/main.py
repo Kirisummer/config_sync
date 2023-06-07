@@ -1,4 +1,5 @@
 from PySide6.QtCore import QObject, Slot, Signal
+from PySide6.QtWidgets import QInputDialog, QMessageBox, QLineEdit
 
 from .config import RepoConfigController
 from .repo import RepoPageController
@@ -6,7 +7,10 @@ from .user_admin import AdminUserController
 from .user_owner import OwnerUserController
 from .repo_users import RepoUsersController
 
-from api.commands import AdminPackage, AccessPackage, RepoPackage, SelfPackage, UserPackage
+from api.commands import (
+        AdminPackage, AccessPackage, RepoPackage, SelfPackage, UserPackage
+)
+from api.command_error import InvalidPasswordError, CommandError
 from api.ssh import SSH
 from api.git import GitRepo, GitCloner
 from common import Role
@@ -48,6 +52,10 @@ class MainController:
         def push(self):
             self.control.push()
 
+        @Slot()
+        def change_passwd(self):
+            self.control.change_passwd()
+
     CONFIG_TAB = 'Repository management'
 
     def __init__(self,
@@ -80,16 +88,12 @@ class MainController:
 
     def update_creds(self, creds: 'api.ssh.SSHCreds'):
         self.creds = creds
-
-        for repo_tab in self.repo_tabs:
-            repo_tab.set_repo(GitRepo.get(creds))
-
         ssh = SSH.get(creds)
-        self.config_conn.replace_ssh(
+        self.config_tab.replace_ssh(
                 RepoPackage(ssh),
                 SelfPackage(ssh),
-                GitCloner.get(creds)
-        )
+                GitCloner.get(creds))
+        self.populate_tabs()
 
     def populate_tabs(self):
         self.ui.tab_widget.clear()
@@ -106,6 +110,7 @@ class MainController:
         self.ui.tab_widget.currentChanged.connect(self.signals.check_enable_repo_menu)
         self.ui.repo_pull.triggered.connect(self.signals.pull)
         self.ui.self_log_out.triggered.connect(self.signals.logged_out)
+        self.ui.self_passwd.triggered.connect(self.signals.change_passwd)
 
         if self.role.is_admin():
             self.ui.users_manage.triggered.connect(self.signals.open_users)
@@ -116,9 +121,27 @@ class MainController:
             self.ui.repo_users.setVisible(False)
             self.ui.repo_push.setVisible(False)
 
-    def open_users(self):
-        users = self.get_user_controller()
-        users.dialog.exec()
+    def change_passwd(self):
+        self_cmds = SelfPackage(SSH.get(self.creds))
+        passwd, ok = QInputDialog.getText(
+                self.window,
+                self.window.tr('Password change'),
+                self.window.tr('Password:'),
+                QLineEdit.Password)
+        if not ok:
+            return
+
+        try:
+            self_cmds.passwd(passwd)
+        except (InvalidPasswordError, CommandError) as ex:
+            show_error(self.window, ex)
+        else:
+            QMessageBox.information(
+                    self.window,
+                    self.window.tr('Success'),
+                    self.window.tr('Password changed successfully'))
+            new_creds = self.creds.change_password(passwd)
+            self.update_creds(new_creds)
 
     def pull(self):
         repo_page = self.get_current_repo()
@@ -137,6 +160,10 @@ class MainController:
                 UserPackage(ssh),
                 AccessPackage(ssh))
         repo_users.dialog.exec()
+
+    def open_users(self):
+        users = self.get_user_controller()
+        users.dialog.exec()
 
     def get_user_controller(self):
         ssh = SSH.get(self.creds)
