@@ -1,2 +1,2 @@
 set PATH=%PATH%;ssh_bin
-python main.py
+main.exe
