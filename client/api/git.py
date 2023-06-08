@@ -66,10 +66,10 @@ class GitRepo:
         ).split('\n', 5)
         return diff_lines[-1]
 
-    def pull(self):
+    def fetch(self):
         self.discard_local()
         with self.repo.git.custom_environment(GIT_SSH_COMMAND=' '.join(self.ssh_cmd)):
-            self.repo.git.pull('--all')
+            self.repo.git.fetch('--all')
 
     def push(self, ref):
         with self.repo.git.custom_environment(GIT_SSH_COMMAND=' '.join(self.ssh_cmd)):

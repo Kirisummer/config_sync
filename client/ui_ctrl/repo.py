@@ -58,16 +58,9 @@ class RepoPageController:
         self.repo = repo
         self.change_controller.set_repo(repo)
 
-    def process_pull(self):
-        ok = QMessageBox.question(
-                self.widget,
-                self.widget.tr('Pull confirmation'),
-                self.widget.tr('Local changes will be discarded. Continue?'))
-        if ok != QMessageBox.StandardButton.Yes:
-            return
-
+    def process_fetch(self):
         try:
-            self.repo.pull()
+            self.repo.fetch()
         except GitCommandError as ex:
             QMessageBox.critical(
                     self.widget,
@@ -77,8 +70,8 @@ class RepoPageController:
         else:
             QMessageBox.information(
                     self.widget,
-                    self.widget.tr('Pull complete'),
-                    self.widget.tr('Pull was completed successfully')
+                    self.widget.tr('Fetch complete'),
+                    self.widget.tr('Fetch was completed successfully')
             )
         self.change_controller.populate_heads()
 
