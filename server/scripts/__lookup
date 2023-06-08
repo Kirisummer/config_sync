@@ -6,7 +6,7 @@ user_exists() {
 
 get_role() {
     local login="$1"
-    local groups="$(groups "$login")"
+    local groups="$(groups "$login" | awk -F' : ' '{print $2}')"
 
     if grep -qE "\<$OWNER_GRP\>" <<< "$groups"; then
         echo owner
