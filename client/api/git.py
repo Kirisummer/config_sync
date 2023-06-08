@@ -45,8 +45,14 @@ class GitRepo:
         return list(commit.stats.files), commit.message
 
     def discard_local(self):
-        self.repo.git.restore('--staged', '.')
-        self.repo.git.checkout('--', '.')
+        try:
+            self.repo.git.restore('--staged', '.')
+        except GitCommandError:
+            pass
+        try:
+            self.repo.git.restore('.')
+        except GitCommandError:
+            pass
 
     def checkout(self, revision):
         self.discard_local()
@@ -61,7 +67,7 @@ class GitRepo:
         return diff_lines[-1]
 
     def pull(self):
-        self.repo.discard_local()
+        self.discard_local()
         with self.repo.git.custom_environment(GIT_SSH_COMMAND=' '.join(self.ssh_cmd)):
             self.repo.git.pull('--all')
 
