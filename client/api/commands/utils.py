@@ -17,6 +17,7 @@ class Package:
 def handle_fail(method, *args, **kw):
     ''' Handle possible failure or return call result '''
     res = method(*args, **kw)
+    print(res)
     if not res.returncode:
         return res
     parse_and_raise(res)

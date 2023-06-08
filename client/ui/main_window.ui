@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>850</height>
+    <height>851</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Configuration Synchronization</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -67,6 +67,7 @@
     <property name="title">
      <string>Repository</string>
     </property>
+    <addaction name="repo_refresh"/>
     <addaction name="repo_fetch"/>
     <addaction name="repo_push"/>
     <addaction name="repo_users"/>
@@ -114,6 +115,11 @@
   <action name="users_admins">
    <property name="text">
     <string>Admin Rights...</string>
+   </property>
+  </action>
+  <action name="repo_refresh">
+   <property name="text">
+    <string>Refresh</string>
    </property>
   </action>
  </widget>

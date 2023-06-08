@@ -45,6 +45,10 @@ class MainController:
             self.control.check_enable_repo_menu(row)
 
         @Slot()
+        def refresh(self):
+            self.control.refresh()
+
+        @Slot()
         def fetch(self):
             self.control.fetch()
 
@@ -108,6 +112,7 @@ class MainController:
     def setup_actions(self):
         # disable repo menu on config tab
         self.ui.tab_widget.currentChanged.connect(self.signals.check_enable_repo_menu)
+        self.ui.repo_refresh.triggered.connect(self.signals.refresh)
         self.ui.repo_fetch.triggered.connect(self.signals.fetch)
         self.ui.self_log_out.triggered.connect(self.signals.logged_out)
         self.ui.self_passwd.triggered.connect(self.signals.change_passwd)
@@ -142,6 +147,10 @@ class MainController:
                     self.window.tr('Password changed successfully'))
             new_creds = self.creds.change_password(passwd)
             self.update_creds(new_creds)
+
+    def refresh(self):
+        repo_page = self.get_current_repo()
+        repo_page.process_refresh()
 
     def fetch(self):
         repo_page = self.get_current_repo()

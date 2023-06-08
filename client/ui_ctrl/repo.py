@@ -58,6 +58,9 @@ class RepoPageController:
         self.repo = repo
         self.change_controller.set_repo(repo)
 
+    def process_refresh(self):
+        self.change_controller.populate_heads()
+
     def process_fetch(self):
         try:
             self.repo.fetch()
