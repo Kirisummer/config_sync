@@ -20,7 +20,7 @@ validate_passwd() {
 
 validate_repo_name() {
     local repo="$1"
-    if ! ( grep -qE '^([[:alnum:]]|[ _.-])+$' <<< "$repo" ); then
+    if ! ( grep -qE '^([[:alnum:]]|[ _. -])+$' <<< "$repo" ); then
         printf '%s: Invalid repo name: repo=`%s`' "$0" "$repo" >&2
         false
     fi
