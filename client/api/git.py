@@ -10,6 +10,12 @@ def get_repo_url(creds: 'SSHCreds', repo_name: str):
 def get_ssh_cmd(cmd_bits: 'SSHCmdBits', creds: 'SSHCreds'):
     return (*cmd_bits.passwd_pipe, creds.password, *cmd_bits.ssh_opts)
 
+def ignore_git_command_error(func):
+    try:
+        return func()
+    except GitCommandError:
+        pass
+
 class GitRepo:
     def __init__(self,
                  repo: 'commit.Repo',
@@ -45,14 +51,8 @@ class GitRepo:
         return list(commit.stats.files), commit.message
 
     def discard_local(self):
-        try:
-            self.repo.git.restore('--staged', '.')
-        except GitCommandError:
-            pass
-        try:
-            self.repo.git.restore('.')
-        except GitCommandError:
-            pass
+        ignore_git_command_error(lambda: self.repo.git.restore('--staged', '.'))
+        ignore_git_command_error(lambda: self.repo.git.restore('.'))
 
     def checkout(self, revision):
         self.discard_local()
@@ -68,8 +68,13 @@ class GitRepo:
 
     def fetch(self):
         self.discard_local()
+        ignore_git_command_error(lambda: self.repo.git.checkout('HEAD', '--detach'))
+        for branch in self.branches():
+            self.repo.git.branch('-D', branch)
         with self.repo.git.custom_environment(GIT_SSH_COMMAND=' '.join(self.ssh_cmd)):
             self.repo.git.fetch('--all')
+        for ref in self.refs():
+            self.repo.git.checkout('--track', ref)
 
     def push(self, ref):
         with self.repo.git.custom_environment(GIT_SSH_COMMAND=' '.join(self.ssh_cmd)):
